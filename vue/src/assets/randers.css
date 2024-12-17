@@ -1,0 +1,63 @@
+/* Randers design */ 
+
+.randers-logo
+{
+    background-image: url('https://www.randers.dk/static/logo.svg');
+    filter: brightness(0) invert(20%) sepia(9%) saturate(7500%) hue-rotate(200deg) brightness(95%) contrast(95%);
+
+    background-position: 1.5rem 0.5rem;
+    background-size: 85%;
+    background-repeat: no-repeat;
+
+    width: 20rem;
+    height: 4.5rem;
+}
+.darkmode .randers-logo
+{
+    filter: brightness(0) invert(20%) sepia(9%) saturate(6000%) hue-rotate(200deg) brightness(150%) contrast(95%);
+}
+
+
+/* Randers farver */
+
+:root
+{
+    --randers-color-: #2f469c;
+    --randers-color-dark: #243576;
+    --randers-color-semilight: #5265a8;
+    --randers-color-light: #6f7eb4;
+}
+.darkmode, .darkmode *
+{
+    --randers-color-: #5265a8;
+}
+
+a
+{
+    color: var(--randers-color-); 
+}
+    a:focus
+    {
+        color: var(--randers-color-);
+    }
+    a:hover
+    {
+        color: var(--randers-color-light);
+    }
+
+button, input[type='submit']
+{
+    background-color: var(--randers-color-);
+}
+    button:focus, input[type='submit']:focus
+    {
+        background-color: var(--randers-color-);
+    }
+    button:hover, input[type='submit']:hover
+    {
+        background-color: var(--randers-color-semilight);
+    }
+    .darkmode button:hover, .darkmode input[type='submit']:hover
+    {
+        background-color: var(--randers-color-light);
+    }

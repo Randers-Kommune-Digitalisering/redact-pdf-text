@@ -1,0 +1,434 @@
+/* Import */
+
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic");    /* Google Font: Roboto */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400");                                     /* Google Font: Inter */
+@import url("https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css");                        /* Normalize for CSS reset */
+@import url("https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css");                        /* Milligram CSS template */
+
+@import './randers.css';    /* Custom Randers CSS */
+
+/* Base CSS changes */
+
+:root
+{
+    --color-bg: #f0f5f3;
+    --color-bg-light: #fbfbfb;
+
+    --color-text: #444d54;
+    --color-text-dark: #373d43;
+
+    --color-green: rgb(35, 176, 106);
+    --color-green-light: rgb(99, 181, 140);
+    --color-red: rgb(179, 38, 38);
+    --color-red-light: rgb(187, 73, 73);
+    --color-blue: rgb(27, 153, 207);
+    --color-blue-light: rgb(84, 170, 206);
+    --color-orange: rgb(208, 140, 21);
+    --color-orange-light: rgb(215, 160, 65);
+    --color-white: rgb(248, 248, 248);
+
+    --color-border: #dddddd;
+    --color-border-dark: #c5c5c5;
+}
+
+*
+{
+    box-sizing: border-box;
+}
+
+html
+{
+    overflow-y: scroll;
+}
+
+body
+{
+    background-color: var(--color-bg); /* Brighter: #fafafa; Old: #f4f5f6; */
+    color: var(--color-text);
+}
+
+main
+{
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+span
+{
+    display: inline-block;
+}
+
+a
+{
+    font-weight: 400;
+}
+
+input, a, button
+{
+    transition: 120ms ease-in-out;
+}
+
+button + button
+{
+    margin-left: 0.5rem;
+}
+
+h2 {
+    border-bottom: 0.1rem solid var(--color-border); /* Old: rgb(235, 235, 235); */
+    color:var(--color-text-dark);
+}
+
+h2:not(:first-of-type), h3:not(:first-of-type), h4:not(:first-of-type), h5:not(:first-of-type), h6:not(:first-of-type)
+{
+    margin-top: 3rem;
+}
+
+h3 > svg
+{
+    margin-right: 1rem;
+}
+
+th, label
+{
+    font-weight: 500;
+}
+
+table, form
+{
+    margin-bottom: auto;
+}
+
+button, input[type='submit']
+{
+    border: 0rem;
+}
+    button:disabled, input[type='submit']:disabled
+    {
+        background-color: var(--color-text)!important;
+    }
+
+input, input[type='text']
+{
+    border-color: var(--color-border-dark);
+}
+
+input:not([type='submit']):focus
+{
+    border-color: var(--color-blue);
+}
+input:not([type='submit']):required:invalid:focus
+{
+    border-color: var(--color-orange);
+}
+
+input[type='range']
+{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 1.2rem;
+    border-radius: 0.65rem;
+    background: var(--color-border-dark);
+}
+    input[type='range']:not(:disabled)::-webkit-slider-thumb
+    {
+        appearance: none;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%; 
+        background: var(--randers-color-dark);
+        cursor: pointer;
+    }
+        input[type='range']:not(:disabled)::-webkit-slider-thumb:hover
+        {
+            background: var(--randers-color-);
+        }
+    input[type='range']:not(:disabled)::-moz-range-thumb
+    {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background: var(--randers-color-);
+        cursor: pointer;
+    }
+        input[type='range']:not(:disabled)::-moz-range-thumb:hover
+        {
+            background: var(--randers-color-);
+        }
+    input[type='range']:disabled::-webkit-slider-thumb
+    {
+        display: none;
+    }
+    input[type='range']:disabled::-moz-range-thumb
+    {
+        display: none;
+    }
+
+input[type='checkbox'], input[type='radio']
+{
+    padding-top: 1rem;
+    width: 1.5rem;
+    height: 1.6rem;
+    border-radius: 10rem;
+    transform: translateY(0.25rem);
+}
+input[type='checkbox'] + label, input[type='radio'] + label
+{
+    display: inline-block;
+    margin-left: 1rem;
+}
+
+code {
+    background-color: var(--color-border);
+}
+
+
+/* Custom components */
+
+.paragraph + *
+{
+    margin-top: 2rem;
+}
+
+.flexbox
+{
+    display: flex;
+    justify-content: flex-start;
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.flexbox.grow > *
+{
+    flex-grow: 1;
+}
+    .flexbox > div
+    {
+        width: 100%; /* Mobile first */
+    }
+
+.card
+{
+    border-radius: 0.5rem;
+    border: 0.1rem solid var(--color-border-dark);
+
+    width: 100%; /* Mobile first */
+}
+
+@media screen and (min-width: 40rem) /* 850px or 85rem using 16 px conversion */
+{
+    .card, .flexbox > div
+    {    
+        width: calc(50% - 0.5rem); /* When screen is larger than mobile */
+    }
+}
+    .card > .header
+    {
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+        border-bottom: 0.1rem solid var(--color-border); 
+        background-color: var(--color-bg);
+
+        font-weight: 500;
+        padding: 1rem 1.5rem;
+    }
+    .card > .card-body
+    {
+        padding: 1.2rem 1.5rem;
+    }
+
+    .card table
+    {
+        display: table;
+        margin-top: -1rem;
+        margin-bottom: -1rem;
+    }
+    .card table > tr:last-of-type > td
+    {
+        border-bottom: 0rem;
+    }
+    .card table ~ *
+    {
+        margin-top: 2rem;
+    }
+
+/* Message */
+.message
+{
+    background-color: var(--color-border-dark);
+    border-radius: 0.5rem;
+    padding: 1.2rem 1.5rem;
+}
+    .message > .header
+    {
+        font-weight: 400;
+        font-size: 1.2em;
+    }
+    .message > .header > .close
+    {
+        background-color: var(--color-bg);
+        font-size: 0.8em;
+        border-radius: 0.5rem;
+        padding: 0rem 1rem;
+    }
+        .message > .header > .close:hover
+        {
+            cursor: pointer;
+            background-color: var(--color-bg-light);
+        }
+    .message.hidden
+    {
+        display: none;
+    }
+
+/* Tag */
+.tag
+{
+    font-size: 0.9em;
+    color: var(--color-text-dark)!important;
+    
+    border: 0.1rem solid var(--color-border-dark);
+    background-color: var(--color-bg);
+    border-radius: 0.3rem;
+    
+    padding: 0.1rem 0.5rem;
+}
+.tag + .tag
+{
+    margin-left: 0.5rem;
+}
+
+/* Pagination */
+.pagination > *
+{
+    background-color: var(--color-bg);
+    border: 0.1rem solid var(--color-border);
+    padding: 0.5em 1rem;
+    color: var(--color-text);
+}
+.pagination > .disabled
+{
+    color: var(--color-border-dark)!important;
+}
+.pagination > .selected
+{
+    background-color: var(--color-border);
+    color: var(--color-text)!important;
+}
+.pagination > .selected:hover, .pagination > .disabled:hover
+{
+    cursor:default;
+}
+.pagination > :hover:not(.selected, .disabled)
+{
+    cursor: pointer;
+    background-color: var(--color-bg-light);
+}
+.pagination > :first-child
+{
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+}
+.pagination > :last-child
+{
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+
+
+/* Custom style classes */
+
+.capitalize
+{ text-transform: capitalize; }
+
+.heavy
+{ font-weight: 400; }
+
+.column
+{ flex-direction: column; }
+
+.center
+{ text-align: center; }
+
+
+
+/* Custom colored elements */
+
+span.red
+{ color: var(--color-red); }
+.card.red, .tag.red
+{ border-color: var(--color-red); }
+button.red, input[type='submit'].red, .message.red
+{ background-color: var(--color-red); }
+
+button.red:hover, input[type='submit'].red:hover
+{ background-color: var(--color-red-light); }
+
+span.green
+{ color: var(--color-green); }
+.card.green, .tag.green
+{ border-color: var(--color-green); }
+button.green, input[type='submit'].green, .message.green
+{ background-color: var(--color-green); }
+
+button.green:hover, input[type='submit'].green:hover
+{ background-color: var(--color-green-light); }
+
+span.blue
+{ color: var(--color-blue); }
+.card.blue, .tag.blue
+{ border-color: var(--color-blue); }
+button.blue, input[type='submit'].blue, .message.blue
+{ background-color: var(--color-blue); }
+
+button.blue:hover, input[type='submit'].blue:hover
+{ background-color: var(--color-blue-light); }
+
+span.orange
+{ color: var(--color-orange); }
+.card.orange, .tag.orange
+{ border-color: var(--color-orange); }
+button.orange, input[type='submit'].orange, .message.orange
+{ background-color: var(--color-orange); }
+
+button.orange:hover, input[type='submit'].orange:hover
+{ background-color: var(--color-orange-light); }
+
+span.randers
+{ color: var(--randers-color-); }
+.card.randers, .tag.randers
+{ border-color: var(--randers-color-); }
+button.randers, input[type='submit'].randers, .message.randers
+{ background-color: var(--randers-color-); }
+
+button.randers:hover, input[type='submit'].randers:hover
+{ background-color: var(--color-randers-semilight); }
+
+.message.red, .message.green, .message.blue, .message.orange, .message.randers
+{ color: var(--color-white); }
+.message .close
+{ color: var(--color-text) }
+
+
+/* Dark mode */
+
+.darkmode, .darkmode *
+{
+    --color-bg: #1a1a1a;
+    --color-bg-light: #1e1e1e;
+
+    --color-text: #bababa;
+    --color-text-dark: #f8f8f8;
+
+    --color-border: #2b2b2b;
+    --color-border-dark: #4e4e4e;
+}
+.darkmode input, .darkmode code, .darkmode table, .darkmode table * {
+    border-color: var(--color-border-dark);
+    color: var(--color-text);
+}
+.darkmode code, .darkmode .tag {
+    background-color: var(--color-border);
+}

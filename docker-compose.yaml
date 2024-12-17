@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    
+    ports:
+      - "8080:8080"
+      - "3000:3000"
+    environment:
+      DEBUG: True
+      CHOKIDAR_USEPOLLING: true
+    volumes:
+      - ./vue:/app/vue:delegated
+      - /app/vue/node_modules
+      - ./flask/src/:/app/flask/
+      # - "./vue/:/app/vue/"
+    command: sh -c "cd /app/flask && python main.py & cd /app/vue && npm run host"
