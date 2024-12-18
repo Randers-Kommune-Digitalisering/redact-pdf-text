@@ -53,12 +53,16 @@ const onTextLayerMouseUp = (event) => {
     }
 }
 
-const renderPage = (page) => {
+const renderPage = (page, pdf) => {
     const containerWidth = pdfViewerContainer.value.clientWidth
     console.log("containerWidth", containerWidth)
     const viewport = page.getViewport({ scale: 1 })
     const scale = containerWidth / viewport.width
     const scaledViewport = page.getViewport({ scale })
+
+    const pageContainer = document.createElement('div')
+    pageContainer.style.position = 'relative'
+    pageContainer.style.marginBottom = '1rem'
 
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
@@ -69,34 +73,42 @@ const renderPage = (page) => {
         canvasContext: context,
         viewport: scaledViewport
     }
-    page.render(renderContext)
+    page.render(renderContext).promise.then(() => {
+        const textLayerDiv = document.createElement('div')
+        textLayerDiv.className = 'textLayer'
+        textLayerDiv.style.height = `${scaledViewport.height}px`
+        textLayerDiv.style.width = `${containerWidth}px`
+        textLayerDiv.style.position = 'absolute'
+        textLayerDiv.style.top = '0'
+        textLayerDiv.style.left = '0'
 
-    const textLayerDiv = document.createElement('div')
-    textLayerDiv.className = 'textLayer'
-    pdfViewerContainer.value.appendChild(textLayerDiv)
+        page.getTextContent().then(textContent => {
+            pdfjsLib.renderTextLayer({
+                textContent: textContent,
+                container: textLayerDiv,
+                viewport: scaledViewport,
+                textDivs: []
+            })
 
-    page.getTextContent().then(textContent => {
-        pdfjsLib.renderTextLayer({
-            textContent: textContent,
-            container: textLayerDiv,
-            viewport: scaledViewport,
-            textDivs: []
+            textLayerDiv.addEventListener('mouseup', onTextLayerMouseUp)
         })
 
-        textLayerDiv.addEventListener('mouseup', onTextLayerMouseUp)
+        pageContainer.appendChild(canvas)
+        pageContainer.appendChild(textLayerDiv)
+        pdfViewerContainer.value.appendChild(pageContainer)
     })
-
-    pdfViewerContainer.value.appendChild(canvas)
 }
 
 const loadPdf = () => {
     if(props.source === null) return
     const loadingTask = pdfjsLib.getDocument(props.source)
     loadingTask.promise.then(pdf => {
-        pdf.getPage(1).then(page => {
-            pdfViewerContainer.value.innerHTML = '' // Clear previous content
-            renderPage(page)
-        })
+        pdfViewerContainer.value.innerHTML = '' // Clear previous content
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            pdf.getPage(pageNum).then(page => {
+                renderPage(page, pdf)
+            })
+        }
     })
 }
 
