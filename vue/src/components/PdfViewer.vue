@@ -12,48 +12,36 @@ const props = defineProps({
   }
 })
 
-watch(() => props.source, (newSource) => {
+watch(() => props.source, (newSource) =>
+{
     if (newSource) {
         loadPdf()
     }
 })
 
-// const pdfSource = ref(null)
 const pdfViewerContainer = ref(null)
-const popup = ref(null)
+
 const textSelection = ref(null)
-
-// const handleTextSelection = (selectedText) => {
-//     console.log('Selected text:', selectedText)
-// }
-
-const showPopup = (x, y, text) => {
-    popup.value.style.left = `${x - 50}px`
-    popup.value.style.top = `${y - 50}px`
-    popup.value.textContent = text
-    popup.value.style.display = 'block'
+const emit = defineEmits(['selectText'])
+const setSelectedText = (value, x, y) =>
+{
+    emit('selectText', value, x, y)
 }
 
-const hidePopup = () => {
-    popup.value.style.display = 'none'
-}
-
-const onTextLayerMouseUp = (event) => {  
+const onTextLayerMouseUp = (event) =>
+{  
     const selectedText = window.getSelection().toString()
     if (selectedText && selectedText.trim().length > 0 && selectedText !== textSelection.value){
         const { clientX: x, clientY: y } = event
-        showPopup(x, y, selectedText)
-        //handleTextSelection(selectedText)
+        setSelectedText(selectedText, x, y)
         textSelection.value = selectedText
     }
     else
-    {
-        hidePopup()
         textSelection.value = null
-    }
 }
 
-const renderPage = (page, pdf) => {
+const renderPage = (page, pdf) =>
+{
     const containerWidth = pdfViewerContainer.value.clientWidth
     console.log("containerWidth", containerWidth)
     const viewport = page.getViewport({ scale: 1 })
@@ -73,7 +61,9 @@ const renderPage = (page, pdf) => {
         canvasContext: context,
         viewport: scaledViewport
     }
-    page.render(renderContext).promise.then(() => {
+
+    page.render(renderContext).promise.then(() =>
+    {
         const textLayerDiv = document.createElement('div')
         textLayerDiv.className = 'textLayer'
         textLayerDiv.style.height = `${scaledViewport.height}px`
@@ -82,7 +72,8 @@ const renderPage = (page, pdf) => {
         textLayerDiv.style.top = '0'
         textLayerDiv.style.left = '0'
 
-        page.getTextContent().then(textContent => {
+        page.getTextContent().then(textContent =>
+        {
             pdfjsLib.renderTextLayer({
                 textContent: textContent,
                 container: textLayerDiv,
@@ -99,10 +90,23 @@ const renderPage = (page, pdf) => {
     })
 }
 
-const loadPdf = () => {
-    if(props.source === null) return
+const debounce = (func, wait) => {
+    let timeout;
+    return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+};
+
+const loadPdf = () =>
+{
+    if(props.source === null) 
+        return
+
     const loadingTask = pdfjsLib.getDocument(props.source)
-    loadingTask.promise.then(pdf => {
+
+    loadingTask.promise.then(pdf =>
+    {
         pdfViewerContainer.value.innerHTML = '' // Clear previous content
         for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
             pdf.getPage(pageNum).then(page => {
@@ -112,19 +116,22 @@ const loadPdf = () => {
     })
 }
 
-onMounted(() => {
+const debouncedLoadPdf = debounce(loadPdf, 300);
+
+onMounted(() =>
+{
     loadPdf()
-    window.addEventListener('resize', loadPdf)
+    window.addEventListener('resize', debouncedLoadPdf)
 })
 
-onUnmounted(() => {
-    window.removeEventListener('resize', loadPdf)
+onUnmounted(() =>
+{
+    window.removeEventListener('resize', debouncedLoadPdf)
 })
 </script>
 
 <template>
     <div ref="pdfViewerContainer" class="pdf-viewer"></div>
-    <div ref="popup" class="popup"></div>
 </template>
 
 <style scoped>
@@ -132,6 +139,7 @@ onUnmounted(() => {
         width: 100%;
         position: relative;
     }
+
     .textLayer {
         position: absolute;
         top: 0;
@@ -140,17 +148,8 @@ onUnmounted(() => {
         bottom: 0;
         pointer-events: none;
     }
+
     .textLayer div {
         pointer-events: all;
-    }
-    .popup {
-        position: absolute;
-        display: none;
-        background: #fff;
-        border: 1px solid #ccc;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-        border-radius: 0.5rem;
-        padding: 0.8rem;
     }
 </style>
