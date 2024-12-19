@@ -32,7 +32,6 @@
 
     const redactFileData = async () => {
         try {
-            // const fileBuffer = await currentFile.value.arrayBuffer()
             const formData = new FormData();
             formData.append('file', currentFile.value);
             formData.append('pattern', 'person');
@@ -73,6 +72,10 @@
         document.body.removeChild(link);
     }
 
+    const resetFile = () => {
+        currentFile.value = null;
+    }
+
     // onMounted(() => {
     //     if (pdfContainer.value) {
     //         pdfContainer.value.addEventListener('scroll', () => {
@@ -90,8 +93,9 @@
             <PdfViewer :ref="pdfViewer" :source="currentFile" @selectText="onSelectText" />
         </div>
         <div class="optionsContainer">
-            <span @click="redactFileData()">Anonymiser</span> <br />
-            <span @click="downloadFile()">Download</span>
+            <span @click="redactFileData()">Anonymiser</span><br />
+            <span @click="downloadFile()">Download</span><br />
+            <span @click="resetFile()">Start forfra</span>
         </div>
         
     </div>
@@ -103,7 +107,7 @@
     .mainContainer {
         display: flex;
         width: 100%;
-        max-height: 100vh;
+        height: 100vh;
     }
 
     .mainContainer > * {

@@ -37,14 +37,41 @@
 
 <template>
     <div @drop.prevent="onDrop" class="dropZone">
-        <slot></slot>
+        <div class="dropOverlay">
+            <div>
+                <div class="header">Træk og slip</div>
+                <div class="subheader">en PDF-fil her for at starte</div>
+            </div>
+        </div>
     </div>
 </template>
 
 <style scoped>
     .dropZone {
-        background-color: aquamarine;
+        background-color: rgb(237, 238, 234);
         width: 100%;
         height: 100vh;
+    }
+    .dropOverlay {
+        width: 100%;
+        height: 100%;
+        padding: 1rem;
+        color: rgb(168, 168, 168);
+    }
+    .dropOverlay > div {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 1rem;
+        border: 0.8rem dashed rgb(187, 186, 186, 0.5);
+    }
+    .dropOverlay .header {
+        font-size: 2.5em;
+        font-weight: 400;
+    }
+    .dropOverlay .subheader {
+        font-size: 1.5em;
     }
 </style>
