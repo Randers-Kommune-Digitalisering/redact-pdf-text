@@ -35,15 +35,11 @@ def redact_pdf():
 
     try:
         regex_pattern = json.loads(regex_pattern)
-        logger.warning(f"Parsed regex pattern: {regex_pattern}")
 
         if not isinstance(regex_pattern, list):
             raise ValueError("Regex pattern is not a valid JSON list")
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 400
-
-    if not isinstance(regex_pattern, list):
-        regex_pattern = [regex_pattern]
 
     if not regex_pattern or not all(regex_pattern):
         return jsonify({"success": False, "message": "Regex pattern(s) invalid"}), 400
