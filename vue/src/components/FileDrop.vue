@@ -1,52 +1,52 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-const emit = defineEmits(['files-dropped'])
-const isDragging = ref(false)
+    import { ref, onMounted, onUnmounted } from 'vue'
+    const emit = defineEmits(['files-dropped'])
+    const isDragging = ref(false)
 
-function onDrop(e) {
-    e.preventDefault()
-    isDragging.value = false
-    const files = [...e.dataTransfer.files]
-    emit('files-dropped', files)
-}
-
-function preventDefaults(e) {
-    e.preventDefault()
-}
-
-function handleDragEnter() {
-    isDragging.value = true
-}
-
-function handleDragLeave(e) {
-    isDragging.value = false
-}
-
-const events = ['dragenter', 'dragover', 'dragleave', 'drop']
-
-onMounted(() => {
-    const dropZone = document.querySelector('.dropZone')
-    if (dropZone) {
-        events.forEach((eventName) => {
-            dropZone.addEventListener(eventName, preventDefaults)
-        })
-        dropZone.addEventListener('dragenter', handleDragEnter)
-        dropZone.addEventListener('dragleave', handleDragLeave)
-        dropZone.addEventListener('drop', handleDragLeave)
+    function onDrop(e) {
+        e.preventDefault()
+        isDragging.value = false
+        const files = [...e.dataTransfer.files]
+        emit('files-dropped', files)
     }
-})
 
-onUnmounted(() => {
-    const dropZone = document.querySelector('.dropZone')
-    if (dropZone) {
-        events.forEach((eventName) => {
-            dropZone.removeEventListener(eventName, preventDefaults)
-        })
-        dropZone.removeEventListener('dragenter', handleDragEnter)
-        dropZone.removeEventListener('dragleave', handleDragLeave)
-        dropZone.removeEventListener('drop', handleDragLeave)
+    function preventDefaults(e) {
+        e.preventDefault()
     }
-})
+
+    function handleDragEnter() {
+        isDragging.value = true
+    }
+
+    function handleDragLeave(e) {
+        isDragging.value = false
+    }
+
+    const events = ['dragenter', 'dragover', 'dragleave', 'drop']
+
+    onMounted(() => {
+        const dropZone = document.querySelector('.dropZone')
+        if (dropZone) {
+            events.forEach((eventName) => {
+                dropZone.addEventListener(eventName, preventDefaults)
+            })
+            dropZone.addEventListener('dragenter', handleDragEnter)
+            dropZone.addEventListener('dragleave', handleDragLeave)
+            dropZone.addEventListener('drop', handleDragLeave)
+        }
+    })
+
+    onUnmounted(() => {
+        const dropZone = document.querySelector('.dropZone')
+        if (dropZone) {
+            events.forEach((eventName) => {
+                dropZone.removeEventListener(eventName, preventDefaults)
+            })
+            dropZone.removeEventListener('dragenter', handleDragEnter)
+            dropZone.removeEventListener('dragleave', handleDragLeave)
+            dropZone.removeEventListener('drop', handleDragLeave)
+        }
+    })
 </script>
 
 <template>
