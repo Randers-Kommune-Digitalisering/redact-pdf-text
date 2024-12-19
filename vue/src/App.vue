@@ -45,14 +45,6 @@
                 const blob = await response.blob();
                 const file = new File([blob], 'redacted.pdf', { type: 'application/pdf' });
                 currentFile.value = file;
-                // Force download
-                // const url = URL.createObjectURL(blob);
-                // const link = document.createElement('a');
-                // link.href = url;
-                // link.download = 'redacted.pdf';
-                // document.body.appendChild(link);
-                // link.click();
-                // document.body.removeChild(link);
             } else {
                 try {
                     const data = await response.json();
@@ -62,14 +54,23 @@
                     console.error('Error parsing redaction response:', error);
                 }
             }
-
-
-
-
         } catch (error) {
             console.error('Error redacting file:', error);
         }
 
+    }
+
+    const downloadFile = async () => {
+        // Force download
+        const fileBuffer = await currentFile.value.arrayBuffer();
+        const blob = new Blob([fileBuffer], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'redacted.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     // onMounted(() => {
@@ -88,7 +89,10 @@
         <div ref="pdfContainer" class="pdfContainer">
             <PdfViewer :ref="pdfViewer" :source="currentFile" @selectText="onSelectText" />
         </div>
-        <div class="optionsContainer"><span @click="redactFileData()">Test 2</span></div>
+        <div class="optionsContainer">
+            <span @click="redactFileData()">Anonymiser</span> <br />
+            <span @click="downloadFile()">Download</span>
+        </div>
         
     </div>
     
