@@ -53,7 +53,9 @@ def redact_pdf():
                 text_instances.extend(page.search_for(match.group()))
 
         for instance in text_instances:
-            print(f"Found match on page {page_num + 1}: {page.get_text('text', clip=instance)}")
+            if page.get_text('text', clip=instance) == "":
+                continue
+
             # Add a redact annotation over the found area (position)
             page.add_redact_annot(instance)
             page.apply_redactions()

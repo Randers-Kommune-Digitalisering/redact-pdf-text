@@ -35,7 +35,7 @@
             // const fileBuffer = await currentFile.value.arrayBuffer()
             const formData = new FormData();
             formData.append('file', currentFile.value);
-            formData.append('pattern', 'Test');
+            formData.append('pattern', 'person');
             const response = await fetch('http://localhost:3000/api/redact', {
                 method: 'POST',
                 body: formData
@@ -43,13 +43,16 @@
             
             if (response.headers.get('content-type') === 'application/pdf') {
                 const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'redacted.pdf';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                const file = new File([blob], 'redacted.pdf', { type: 'application/pdf' });
+                currentFile.value = file;
+                // Force download
+                // const url = URL.createObjectURL(blob);
+                // const link = document.createElement('a');
+                // link.href = url;
+                // link.download = 'redacted.pdf';
+                // document.body.appendChild(link);
+                // link.click();
+                // document.body.removeChild(link);
             } else {
                 try {
                     const data = await response.json();
