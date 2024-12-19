@@ -1,64 +1,89 @@
 <script setup>
-    import { onMounted, onUnmounted } from 'vue'
-    const emit = defineEmits(['files-dropped'])
+import { ref, onMounted, onUnmounted } from 'vue'
+const emit = defineEmits(['files-dropped'])
+const isDragging = ref(false)
 
-    function onDrop(e) {
-        e.preventDefault()
-        const files = [...e.dataTransfer.files]
-        // files.forEach(file => {
-        //     const reader = new FileReader()
-        //     reader.onload = (event) => {
-        //         const arrayBuffer = event.target.result
-        //     }
-        //     reader.readAsArrayBuffer(file)
-        // })
-        emit('files-dropped', files);
-        // emit('files-dropped', [...e.dataTransfer.files])
-    }
+function onDrop(e) {
+    e.preventDefault()
+    isDragging.value = false
+    const files = [...e.dataTransfer.files]
+    emit('files-dropped', files)
+}
 
-    function preventDefaults(e) {
-        e.preventDefault()
-    }
+function preventDefaults(e) {
+    e.preventDefault()
+}
 
-    const events = ['dragenter', 'dragover', 'dragleave', 'drop']
+function handleDragEnter() {
+    isDragging.value = true
+}
 
-    onMounted(() => {
+function handleDragLeave(e) {
+    isDragging.value = false
+}
+
+const events = ['dragenter', 'dragover', 'dragleave', 'drop']
+
+onMounted(() => {
+    const dropZone = document.querySelector('.dropZone')
+    if (dropZone) {
         events.forEach((eventName) => {
-            document.body.addEventListener(eventName, preventDefaults)
+            dropZone.addEventListener(eventName, preventDefaults)
         })
-    })
+        dropZone.addEventListener('dragenter', handleDragEnter)
+        dropZone.addEventListener('dragleave', handleDragLeave)
+        dropZone.addEventListener('drop', handleDragLeave)
+    }
+})
 
-    onUnmounted(() => {
+onUnmounted(() => {
+    const dropZone = document.querySelector('.dropZone')
+    if (dropZone) {
         events.forEach((eventName) => {
-            document.body.removeEventListener(eventName, preventDefaults)
+            dropZone.removeEventListener(eventName, preventDefaults)
         })
-    })
+        dropZone.removeEventListener('dragenter', handleDragEnter)
+        dropZone.removeEventListener('dragleave', handleDragLeave)
+        dropZone.removeEventListener('drop', handleDragLeave)
+    }
+})
 </script>
 
 <template>
-    <div @drop.prevent="onDrop" class="dropZone">
-        <div class="dropOverlay">
-            <div>
-                <div class="header">Træk og slip</div>
-                <div class="subheader">en PDF-fil her for at starte</div>
-            </div>
+    <div @drop.prevent="onDrop" :class="['dropZone', { 'dragging': isDragging }]"></div>
+    <div class="dropOverlay">
+        <div>
+            <div class="header">Træk og slip</div>
+            <div class="subheader">en PDF-fil her for at starte</div>
         </div>
     </div>
 </template>
 
 <style scoped>
-    .dropZone {
-        background-color: rgb(237, 238, 234);
-        width: 100%;
-        height: 100vh;
+.dropZone {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+}
+    .dropZone.dragging ~ .dropOverlay {
+        background-color: rgb(251, 252, 247);
     }
-    .dropOverlay {
-        width: 100%;
-        height: 100%;
-        padding: 1rem;
-        color: rgb(168, 168, 168);
+    .dropZone.dragging ~ .dropOverlay > div {
+        border: 0.8rem dashed rgba(175, 207, 173, 0.5);
+        color: rgb(175, 207, 173);
     }
+
+.dropOverlay {
+    background-color: rgb(237, 238, 234);
+    transition: 0.3s;
+
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    color: rgb(168, 168, 168);
+}
     .dropOverlay > div {
+        transition: 0.3s;
         height: 100%;
         display: flex;
         justify-content: center;
