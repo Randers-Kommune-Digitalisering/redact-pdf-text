@@ -23,9 +23,16 @@
         currentFilename.value = files[0].name
     }
 
+    let redactTimeout = ref(null)
     const onOptionsUpdate = (options) => {
         currentOptions.value = options
-        console.log('Options updated:', options)
+
+        if (redactTimeout.value) {
+            clearTimeout(redactTimeout.value)
+        }
+        redactTimeout.value = setTimeout(() => {
+            redactFileData()
+        }, 1000)
     }
 
     const showPopup = (x, y, text) => {
@@ -40,6 +47,16 @@
     }
 
     const redactFileData = async () => {
+        if (!originalFile.value) {
+            console.error('No file to redact')
+            return
+        }
+        if (currentOptions.value.length === 0) {
+            console.log('No redaction options, resetting file')
+            currentFile.value = originalFile.value
+            return
+        }
+
         try {
             const formData = new FormData()
             formData.append('file', originalFile.value)
@@ -108,7 +125,6 @@
             </div>
             <div class="actions">
                 <span @click="resetFile()">Start forfra</span>
-                <span @click="redactFileData()">Anonymiser</span>
                 <span @click="downloadFile()">Download</span>
             </div>
         </div>
