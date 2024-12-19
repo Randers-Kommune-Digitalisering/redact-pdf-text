@@ -25,6 +25,9 @@
 
     let redactTimeout = ref(null)
     const onOptionsUpdate = (options) => {
+        if (JSON.stringify(currentOptions.value) === JSON.stringify(options))
+            return
+
         currentOptions.value = options
 
         if (redactTimeout.value) {
