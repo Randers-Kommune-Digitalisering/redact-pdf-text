@@ -40,7 +40,7 @@
 
     const renderPage = (page, pdf) => {
         const containerWidth = pdfViewerContainer.value.clientWidth
-        console.log("containerWidth", containerWidth)
+        //console.log("containerWidth", containerWidth)
         const viewport = page.getViewport({ scale: 1 })
         const scale = containerWidth / viewport.width
         const scaledViewport = page.getViewport({ scale })
