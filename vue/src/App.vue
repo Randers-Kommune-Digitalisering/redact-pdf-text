@@ -1,13 +1,17 @@
 <script setup>
     import FileDrop from './components/FileDrop.vue';
     import PdfViewer from './components/PdfViewer.vue'
+    import OptionList from './components/OptionList.vue'
     import { onMounted, ref } from 'vue'
 
     const pdfContainer = ref(null)
     const pdfViewer = ref(null)
     const popup = ref(null)
 
+    const originalFile = ref(null)
+    const currentFilename = ref(null)
     const currentFile = ref(null)
+    const currentOptions = ref([])
 
     const onSelectText = (text, x, y) => {
         console.log(`Selected text: ${text}`)
@@ -15,8 +19,13 @@
     }
 
     const onFileDrop = (files) => {
-        currentFile.value = files[0]
-        console.log('File dropped:', files[0])
+        originalFile.value = currentFile.value = files[0]
+        currentFilename.value = files[0].name
+    }
+
+    const onOptionsUpdate = (options) => {
+        currentOptions.value = options
+        console.log('Options updated:', options)
     }
 
     const showPopup = (x, y, text) => {
@@ -32,48 +41,49 @@
 
     const redactFileData = async () => {
         try {
-            const formData = new FormData();
-            formData.append('file', currentFile.value);
-            formData.append('pattern', 'person');
+            const formData = new FormData()
+            formData.append('file', originalFile.value)
+            formData.append('pattern', JSON.stringify(currentOptions.value))
             const response = await fetch('http://localhost:3000/api/redact', {
                 method: 'POST',
                 body: formData
             })
             
             if (response.headers.get('content-type') === 'application/pdf') {
-                const blob = await response.blob();
-                const file = new File([blob], 'redacted.pdf', { type: 'application/pdf' });
-                currentFile.value = file;
+                const blob = await response.blob()
+                const file = new File([blob], 'redacted.pdf', { type: 'application/pdf' })
+                currentFile.value = file
             } else {
                 try {
-                    const data = await response.json();
-                    console.log('Redaction response:', data);
+                    const data = await response.json()
                 }
                 catch (error) {
-                    console.error('Error parsing redaction response:', error);
+                    console.error('Error parsing redaction response:', error)
                 }
             }
         } catch (error) {
-            console.error('Error redacting file:', error);
+            console.error('Error redacting file:', error)
         }
 
     }
 
     const downloadFile = async () => {
         // Force download
-        const fileBuffer = await currentFile.value.arrayBuffer();
-        const blob = new Blob([fileBuffer], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'redacted.pdf';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const fileBuffer = await currentFile.value.arrayBuffer()
+        const blob = new Blob([fileBuffer], { type: 'application/pdf' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = currentFilename.value ?? 'anonymiseret.pdf'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
     }
 
     const resetFile = () => {
-        currentFile.value = null;
+        originalFile.value = null
+        currentFile.value = null
+        currentFilename.value = null
     }
 
     // onMounted(() => {
@@ -90,12 +100,17 @@
     <div class="mainContainer" v-if="currentFile != null">
 
         <div ref="pdfContainer" class="pdfContainer">
-            <PdfViewer :ref="pdfViewer" :source="currentFile" @selectText="onSelectText" />
+            <PdfViewer :ref="pdfViewer" :source="currentFile" @text-selected="onSelectText" />
         </div>
         <div class="optionsContainer">
-            <span @click="redactFileData()">Anonymiser</span><br />
-            <span @click="downloadFile()">Download</span><br />
-            <span @click="resetFile()">Start forfra</span>
+            <div class="options">
+                <OptionList @options-updated="onOptionsUpdate" />
+            </div>
+            <div class="actions">
+                <span @click="resetFile()">Start forfra</span>
+                <span @click="redactFileData()">Anonymiser</span>
+                <span @click="downloadFile()">Download</span>
+            </div>
         </div>
         
     </div>
@@ -123,7 +138,29 @@
     .optionsContainer {
         flex-grow: 1;
         background-color: #eeeeee;
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
     }
+
+    .options {
+        flex-grow: 1;
+    }
+    .actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+        .actions span {
+            cursor: pointer;
+            background-color: #9fc0e4;
+            padding: 0.5rem 1rem;
+            border-radius: 0.3rem;
+        }
+        .actions span:hover {
+            background-color: #91b2d5;
+        }
 
     .popup {
         position: absolute;

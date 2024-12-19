@@ -19,22 +19,38 @@ def status():
 
 @api_endpoints.route('/redact', methods=['POST'])
 def redact_pdf():
+    # Check if the request contains a file
     try:
         input_pdf = request.files['file'].read()
         logger.info(f"Received PDF file of size: {len(input_pdf)} bytes")
     except Exception as e:
         return jsonify({"success": False, "message": "File not provided or invalid"}), 400
 
+    # Check if the request contains regex pattern(s)
     try:
-        regex_pattern = request.form.getlist('pattern')
+        regex_pattern = request.form.get('pattern')
+        logger.warning(f"Received regex pattern: {regex_pattern}")
     except Exception as e:
-        return jsonify({"success": False, "message": "Regex pattern not provided or invalid"}), 400
+        return jsonify({"success": False, "message": "Regex pattern not provided"}), 400
+
+    try:
+        regex_pattern = json.loads(regex_pattern)
+        logger.warning(f"Parsed regex pattern: {regex_pattern}")
+
+        if not isinstance(regex_pattern, list):
+            raise ValueError("Regex pattern is not a valid JSON list")
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 400
 
     if not isinstance(regex_pattern, list):
         regex_pattern = [regex_pattern]
+
+    if not regex_pattern or not all(regex_pattern):
+        return jsonify({"success": False, "message": "Regex pattern(s) invalid"}), 400
     
     replacement = request.form.get('replacement', None)
 
+    # Load the PDF file
     try:
         doc = fitz.open(stream=input_pdf, filetype="pdf")
         output_stream = io.BytesIO()

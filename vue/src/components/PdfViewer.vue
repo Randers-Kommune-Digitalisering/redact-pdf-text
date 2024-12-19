@@ -22,10 +22,9 @@
     const pdfViewerContainer = ref(null)
 
     const textSelection = ref(null)
-    const emit = defineEmits(['selectText'])
-    const setSelectedText = (value, x, y) =>
-    {
-        emit('selectText', value, x, y)
+    const emit = defineEmits(['text-selected'])
+    const setSelectedText = (value, x, y) =>{
+        emit('text-selected', value, x, y)
     }
 
     const onTextLayerMouseUp = (event) => {  
