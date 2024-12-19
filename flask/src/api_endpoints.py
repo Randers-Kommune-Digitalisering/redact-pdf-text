@@ -19,11 +19,9 @@ def status():
 
 @api_endpoints.route('/redact', methods=['POST'])
 def redact_pdf():
-    logger.warning(f"Received request to redact PDF")
-
     try:
         input_pdf = request.files['file'].read()
-        logger.warning(f"Received PDF file of size: {len(input_pdf)} bytes")
+        logger.info(f"Received PDF file of size: {len(input_pdf)} bytes")
     except Exception as e:
         return jsonify({"success": False, "message": "File not provided or invalid"}), 400
 
@@ -37,8 +35,11 @@ def redact_pdf():
     
     replacement = request.form.get('replacement', None)
 
-    doc = fitz.open(stream=input_pdf, filetype="pdf")
-    output_stream = io.BytesIO()
+    try:
+        doc = fitz.open(stream=input_pdf, filetype="pdf")
+        output_stream = io.BytesIO()
+    except Exception as e:
+        return jsonify({"success": False, "message": "Error loading PDF file"}), 400
 
     # Loop through each page
     for page_num in range(len(doc)):
