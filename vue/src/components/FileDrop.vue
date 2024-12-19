@@ -42,9 +42,9 @@
 </template>
 
 <style scoped>
-.dropZone {
-    background-color: aquamarine;
-    width: 100%;
-    height: 100vh;
-}
+    .dropZone {
+        background-color: aquamarine;
+        width: 100%;
+        height: 100vh;
+    }
 </style>

@@ -1,133 +1,133 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
-import * as pdfjsLib from 'pdfjs-dist'
-import 'pdfjs-dist/web/pdf_viewer.css'
+    import { ref, onMounted, onUnmounted, watch } from 'vue'
+    import * as pdfjsLib from 'pdfjs-dist'
+    import 'pdfjs-dist/web/pdf_viewer.css'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`
 
-const props = defineProps({
-  source: {
-    type: File,
-    required: true
-  }
-})
-
-watch(() => props.source, (newSource) =>
-{
-    if (newSource) {
-        loadPdf()
+    const props = defineProps({
+    source: {
+        type: File,
+        required: true
     }
-})
+    })
 
-const pdfViewerContainer = ref(null)
+    watch(() => props.source, (newSource) =>
+    {
+        if (newSource) {
+            loadPdf()
+        }
+    })
 
-const textSelection = ref(null)
-const emit = defineEmits(['selectText'])
-const setSelectedText = (value, x, y) =>
-{
-    emit('selectText', value, x, y)
-}
+    const pdfViewerContainer = ref(null)
 
-const onTextLayerMouseUp = (event) => {  
-    const selectedText = window.getSelection().toString()
-    if (selectedText && selectedText.trim().length > 0 && selectedText !== textSelection.value){
-        const { clientX: x, clientY: y } = event
-        setSelectedText(selectedText, x, y)
-        textSelection.value = selectedText
-    }
-    else
-        textSelection.value = null
-}
-
-const renderPage = (page, pdf) => {
-    const containerWidth = pdfViewerContainer.value.clientWidth
-    console.log("containerWidth", containerWidth)
-    const viewport = page.getViewport({ scale: 1 })
-    const scale = containerWidth / viewport.width
-    const scaledViewport = page.getViewport({ scale })
-
-    const pageContainer = document.createElement('div')
-    pageContainer.style.position = 'relative'
-    pageContainer.style.marginBottom = '1rem'
-
-    const canvas = document.createElement('canvas')
-    const context = canvas.getContext('2d')
-    canvas.height = scaledViewport.height
-    canvas.width = containerWidth
-
-    const renderContext = {
-        canvasContext: context,
-        viewport: scaledViewport
+    const textSelection = ref(null)
+    const emit = defineEmits(['selectText'])
+    const setSelectedText = (value, x, y) =>
+    {
+        emit('selectText', value, x, y)
     }
 
-    page.render(renderContext).promise.then(() => {
-        const textLayerDiv = document.createElement('div')
-        textLayerDiv.className = 'textLayer'
-        textLayerDiv.style.height = `${scaledViewport.height}px`
-        textLayerDiv.style.width = `${containerWidth}px`
-        textLayerDiv.style.position = 'absolute'
-        textLayerDiv.style.top = '0'
-        textLayerDiv.style.left = '0'
+    const onTextLayerMouseUp = (event) => {  
+        const selectedText = window.getSelection().toString()
+        if (selectedText && selectedText.trim().length > 0 && selectedText !== textSelection.value){
+            const { clientX: x, clientY: y } = event
+            setSelectedText(selectedText, x, y)
+            textSelection.value = selectedText
+        }
+        else
+            textSelection.value = null
+    }
 
-        page.getTextContent().then(textContent => {
-            pdfjsLib.renderTextLayer({
-                textContent: textContent,
-                container: textLayerDiv,
-                viewport: scaledViewport,
-                textDivs: []
+    const renderPage = (page, pdf) => {
+        const containerWidth = pdfViewerContainer.value.clientWidth
+        console.log("containerWidth", containerWidth)
+        const viewport = page.getViewport({ scale: 1 })
+        const scale = containerWidth / viewport.width
+        const scaledViewport = page.getViewport({ scale })
+
+        const pageContainer = document.createElement('div')
+        pageContainer.style.position = 'relative'
+        pageContainer.style.marginBottom = '1rem'
+
+        const canvas = document.createElement('canvas')
+        const context = canvas.getContext('2d')
+        canvas.height = scaledViewport.height
+        canvas.width = containerWidth
+
+        const renderContext = {
+            canvasContext: context,
+            viewport: scaledViewport
+        }
+
+        page.render(renderContext).promise.then(() => {
+            const textLayerDiv = document.createElement('div')
+            textLayerDiv.className = 'textLayer'
+            textLayerDiv.style.height = `${scaledViewport.height}px`
+            textLayerDiv.style.width = `${containerWidth}px`
+            textLayerDiv.style.position = 'absolute'
+            textLayerDiv.style.top = '0'
+            textLayerDiv.style.left = '0'
+
+            page.getTextContent().then(textContent => {
+                pdfjsLib.renderTextLayer({
+                    textContent: textContent,
+                    container: textLayerDiv,
+                    viewport: scaledViewport,
+                    textDivs: []
+                })
+
+                textLayerDiv.addEventListener('mouseup', onTextLayerMouseUp)
             })
 
-            textLayerDiv.addEventListener('mouseup', onTextLayerMouseUp)
-        })
-
-        pageContainer.appendChild(canvas)
-        pageContainer.appendChild(textLayerDiv)
-        pdfViewerContainer.value.appendChild(pageContainer)
-    })
-}
-
-const debounce = (func, wait) => {
-    let timeout;
-    return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-};
-
-const loadPdf = () => {
-    if (!props.source) 
-        return
-
-    const reader = new FileReader()
-    reader.onload = function(event) {
-        const arrayBuffer = event.target.result
-        const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) })
-
-        loadingTask.promise.then(pdf =>
-        {
-            pdfViewerContainer.value.innerHTML = '' // Clear previous content
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                pdf.getPage(pageNum).then(page => {
-                    renderPage(page, pdf)
-                })
-            }
-        }).catch(error => {
-            console.error('Error loading PDF:', error)
+            pageContainer.appendChild(canvas)
+            pageContainer.appendChild(textLayerDiv)
+            pdfViewerContainer.value.appendChild(pageContainer)
         })
     }
-    reader.readAsArrayBuffer(props.source)
-}
 
-const debouncedLoadPdf = debounce(loadPdf, 300);
+    const debounce = (func, wait) => {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    };
 
-onMounted(() => {
-    loadPdf()
-    window.addEventListener('resize', debouncedLoadPdf)
-})
+    const loadPdf = () => {
+        if (!props.source) 
+            return
 
-onUnmounted(() => {
-    window.removeEventListener('resize', debouncedLoadPdf)
-})
+        const reader = new FileReader()
+        reader.onload = function(event) {
+            const arrayBuffer = event.target.result
+            const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) })
+
+            loadingTask.promise.then(pdf =>
+            {
+                pdfViewerContainer.value.innerHTML = '' // Clear previous content
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    pdf.getPage(pageNum).then(page => {
+                        renderPage(page, pdf)
+                    })
+                }
+            }).catch(error => {
+                console.error('Error loading PDF:', error)
+            })
+        }
+        reader.readAsArrayBuffer(props.source)
+    }
+
+    const debouncedLoadPdf = debounce(loadPdf, 300);
+
+    onMounted(() => {
+        loadPdf()
+        window.addEventListener('resize', debouncedLoadPdf)
+    })
+
+    onUnmounted(() => {
+        window.removeEventListener('resize', debouncedLoadPdf)
+    })
 </script>
 
 <template>
