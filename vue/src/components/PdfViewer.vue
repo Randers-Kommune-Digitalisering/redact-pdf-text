@@ -28,8 +28,7 @@ const setSelectedText = (value, x, y) =>
     emit('selectText', value, x, y)
 }
 
-const onTextLayerMouseUp = (event) =>
-{  
+const onTextLayerMouseUp = (event) => {  
     const selectedText = window.getSelection().toString()
     if (selectedText && selectedText.trim().length > 0 && selectedText !== textSelection.value){
         const { clientX: x, clientY: y } = event
@@ -40,8 +39,7 @@ const onTextLayerMouseUp = (event) =>
         textSelection.value = null
 }
 
-const renderPage = (page, pdf) =>
-{
+const renderPage = (page, pdf) => {
     const containerWidth = pdfViewerContainer.value.clientWidth
     console.log("containerWidth", containerWidth)
     const viewport = page.getViewport({ scale: 1 })
@@ -62,8 +60,7 @@ const renderPage = (page, pdf) =>
         viewport: scaledViewport
     }
 
-    page.render(renderContext).promise.then(() =>
-    {
+    page.render(renderContext).promise.then(() => {
         const textLayerDiv = document.createElement('div')
         textLayerDiv.className = 'textLayer'
         textLayerDiv.style.height = `${scaledViewport.height}px`
@@ -72,8 +69,7 @@ const renderPage = (page, pdf) =>
         textLayerDiv.style.top = '0'
         textLayerDiv.style.left = '0'
 
-        page.getTextContent().then(textContent =>
-        {
+        page.getTextContent().then(textContent => {
             pdfjsLib.renderTextLayer({
                 textContent: textContent,
                 container: textLayerDiv,
@@ -98,8 +94,7 @@ const debounce = (func, wait) => {
     };
 };
 
-const loadPdf = () =>
-{
+const loadPdf = () => {
     if (!props.source) 
         return
 
@@ -125,14 +120,12 @@ const loadPdf = () =>
 
 const debouncedLoadPdf = debounce(loadPdf, 300);
 
-onMounted(() =>
-{
+onMounted(() => {
     loadPdf()
     window.addEventListener('resize', debouncedLoadPdf)
 })
 
-onUnmounted(() =>
-{
+onUnmounted(() => {
     window.removeEventListener('resize', debouncedLoadPdf)
 })
 </script>
