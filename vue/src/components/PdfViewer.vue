@@ -7,7 +7,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 
 const props = defineProps({
   source: {
-    type: String,
+    type: File,
     required: true
   }
 })
@@ -100,20 +100,27 @@ const debounce = (func, wait) => {
 
 const loadPdf = () =>
 {
-    if(props.source === null) 
+    if (!props.source) 
         return
 
-    const loadingTask = pdfjsLib.getDocument(props.source)
+    const reader = new FileReader()
+    reader.onload = function(event) {
+        const arrayBuffer = event.target.result
+        const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) })
 
-    loadingTask.promise.then(pdf =>
-    {
-        pdfViewerContainer.value.innerHTML = '' // Clear previous content
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-            pdf.getPage(pageNum).then(page => {
-                renderPage(page, pdf)
-            })
-        }
-    })
+        loadingTask.promise.then(pdf =>
+        {
+            pdfViewerContainer.value.innerHTML = '' // Clear previous content
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                pdf.getPage(pageNum).then(page => {
+                    renderPage(page, pdf)
+                })
+            }
+        }).catch(error => {
+            console.error('Error loading PDF:', error)
+        })
+    }
+    reader.readAsArrayBuffer(props.source)
 }
 
 const debouncedLoadPdf = debounce(loadPdf, 300);
