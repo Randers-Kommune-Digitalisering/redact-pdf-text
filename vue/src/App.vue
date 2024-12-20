@@ -123,6 +123,7 @@
         originalFile.value = null
         currentFile.value = null
         currentFilename.value = null
+        OptionList.resetOptions()
     }
 
     watch(() => pdfContainer.value, () => {

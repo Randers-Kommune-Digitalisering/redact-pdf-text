@@ -5,8 +5,11 @@
     function addOption(text){
         options.value.push({ id: options.value.length + 1, value: text ?? "" })
     }
+    function resetOptions(){
+        options.value = [{ id: 1, value: "" }]
+    }
     export default {
-        addOption
+        addOption, resetOptions
     }
 </script>
 <script setup>
