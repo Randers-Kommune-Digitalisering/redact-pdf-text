@@ -62,8 +62,13 @@ def redact_pdf():
         text = page.get_text("text")
 
         for pattern in regex_pattern:
-            for match in re.finditer(pattern, text):
-                text_instances.extend(page.search_for(match.group()))
+            if pattern.endswith('/regex'):
+                pattern = pattern[:-6]
+                for match in re.finditer(pattern, text):
+                    text_instances.extend(page.search_for(match.group()))
+            else:
+                # Treat as string
+                text_instances.extend(page.search_for(pattern))
 
         for instance in text_instances:
             if page.get_text('text', clip=instance) == "":
