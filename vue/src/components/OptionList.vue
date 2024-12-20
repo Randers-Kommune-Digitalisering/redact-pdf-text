@@ -3,7 +3,6 @@
             { id: 1, value: "" }
     ])
     function addOption(text){
-        console.log('Adding option:', text)
         options.value.push({ id: options.value.length + 1, value: text ?? "" })
     }
     export default {

@@ -8,7 +8,6 @@
     const pdfContainer = ref(null)
     const pdfViewer = ref(null)
     const popup = ref(null)
-    const optionList = ref(null)
 
     const originalFile = ref(null)
     const currentFilename = ref(null)
@@ -36,8 +35,7 @@
     }
 
     const onRedactTextSelection = () => {
-        //optionList.value.addOption(currentSelectedText.value)
-        console.log('New redacted text:', currentSelectedText.value)
+        OptionList.addOption(currentSelectedText.value)
     }
 
     let redactTimeout = ref(null)
