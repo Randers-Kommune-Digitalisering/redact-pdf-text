@@ -6,10 +6,10 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`
 
     const props = defineProps({
-    source: {
-        type: File,
-        required: true
-    }
+        source: {
+            type: File,
+            required: true
+        }
     })
 
     watch(() => props.source, (newSource) =>
@@ -22,9 +22,12 @@
     const pdfViewerContainer = ref(null)
 
     const textSelection = ref(null)
-    const emit = defineEmits(['text-selected'])
+    const emit = defineEmits(['text-selected', 'loading-complete'])
     const setSelectedText = (value, x, y) =>{
         emit('text-selected', value, x, y)
+    }
+    const notifyLoadingComplete = () =>{
+        emit('loading-complete')
     }
 
     const onTextLayerMouseUp = (event) => {  
@@ -93,7 +96,7 @@
         };
     };
 
-    const loadPdf = () => {
+    const loadPdf = async () => {
         if (!props.source) 
             return
 
@@ -110,7 +113,11 @@
                         renderPage(page, pdf)
                     })
                 }
-            }).catch(error => {
+            })
+            .then(() => {
+                notifyLoadingComplete()
+            })
+            .catch(error => {
                 console.error('Error loading PDF:', error)
             })
         }
@@ -134,6 +141,10 @@
 </template>
 
 <style scoped>
+    .pdfViewerParent
+    {
+        position: relative;
+    }
     .pdf-viewer {
         width: 100%;
         position: relative;

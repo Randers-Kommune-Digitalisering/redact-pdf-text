@@ -12,6 +12,7 @@
     const currentFilename = ref(null)
     const currentFile = ref(null)
     const currentOptions = ref([])
+    const isLoading = ref(false)
 
     const onSelectText = (text, x, y) => {
         console.log(`Selected text: ${text}`)
@@ -21,6 +22,10 @@
     const onFileDrop = (files) => {
         originalFile.value = currentFile.value = files[0]
         currentFilename.value = files[0].name
+    }
+
+    const onLoadingComplete = () => {
+        isLoading.value = false
     }
 
     let redactTimeout = ref(null)
@@ -34,6 +39,7 @@
             clearTimeout(redactTimeout.value)
         }
         redactTimeout.value = setTimeout(() => {
+
             redactFileData()
         }, 1000)
     }
@@ -54,6 +60,9 @@
             console.error('No file to redact')
             return
         }
+        
+        isLoading.value = true
+
         if (currentOptions.value.length === 0) {
             console.log('No redaction options, resetting file')
             currentFile.value = originalFile.value
@@ -76,6 +85,7 @@
             } else {
                 try {
                     const data = await response.json()
+                    console.log('Recieved JSON response:', data)
                 }
                 catch (error) {
                     console.error('Error parsing redaction response:', error)
@@ -84,7 +94,6 @@
         } catch (error) {
             console.error('Error redacting file:', error)
         }
-
     }
 
     const downloadFile = async () => {
@@ -119,8 +128,11 @@
     <FileDrop @files-dropped="onFileDrop" v-if="currentFile == null" />
     <div class="mainContainer" v-if="currentFile != null">
 
-        <div ref="pdfContainer" class="pdfContainer">
-            <PdfViewer :ref="pdfViewer" :source="currentFile" @text-selected="onSelectText" />
+        <div ref="pdfContainer" :class="['pdfContainer', { 'no-scroll': isLoading }]">
+            <div class="loading-screen" v-if="isLoading">
+                <span>Indlæser ...</span>
+            </div>
+            <PdfViewer :ref="pdfViewer" :source="currentFile" @loading-complete="onLoadingComplete" @text-selected="onSelectText" />
         </div>
         <div class="optionsContainer">
             <div class="options">
@@ -143,7 +155,6 @@
         width: 100%;
         height: 100vh;
     }
-
     .mainContainer > * {
         overflow-y: auto;
         scrollbar-gutter: stable; /* Use scrollbar-gutter property */
@@ -153,6 +164,29 @@
     .pdfContainer {
         width: 60%;
     }
+    .loading-screen {
+        position: absolute;
+        width: 60%;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        pointer-events: none;
+    }
+    .loading-screen > span {
+        transform: translateY(-2rem);
+        font-size: 1.5em;
+        color: rgb(168, 168, 168);
+        font-weight: 400;
+    }
+    .no-scroll {
+        overflow: hidden;
+        scrollbar-gutter: stable;
+    }
 
     .optionsContainer {
         flex-grow: 1;
@@ -161,7 +195,6 @@
         flex-direction: column;
         padding: 1rem;
     }
-
     .options {
         flex-grow: 1;
     }
