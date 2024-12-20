@@ -38,7 +38,10 @@
             textSelection.value = selectedText
         }
         else
+        {
             textSelection.value = null
+            setSelectedText(null)
+        }
     }
 
     const renderPage = (page, pdf) => {

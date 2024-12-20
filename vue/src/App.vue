@@ -2,21 +2,28 @@
     import FileDrop from './components/FileDrop.vue';
     import PdfViewer from './components/PdfViewer.vue'
     import OptionList from './components/OptionList.vue'
-    import { onMounted, ref } from 'vue'
+    import Popup from './components/Popup.vue'
+    import { ref, watch } from 'vue'
 
     const pdfContainer = ref(null)
     const pdfViewer = ref(null)
     const popup = ref(null)
+    const optionList = ref(null)
 
     const originalFile = ref(null)
     const currentFilename = ref(null)
     const currentFile = ref(null)
     const currentOptions = ref([])
     const isLoading = ref(false)
+    const isShowingPopup = ref(false)
+    const popUpCoords = ref({ x: 0, y: 0 })
+    const initialPopupY = ref(0)
+    const initialScrollY = ref(0)
+    const currentSelectedText = ref(null)
 
-    const onSelectText = (text, x, y) => {
-        console.log(`Selected text: ${text}`)
-        console.log(`Coordinates: x=${x}, y=${y}`)
+    const onSelectText = (text, x = 0, y = 0) => {
+        currentSelectedText.value = text
+        togglePopUp(text, x, y)
     }
 
     const onFileDrop = (files) => {
@@ -26,6 +33,11 @@
 
     const onLoadingComplete = () => {
         isLoading.value = false
+    }
+
+    const onRedactTextSelection = () => {
+        //optionList.value.addOption(currentSelectedText.value)
+        console.log('New redacted text:', currentSelectedText.value)
     }
 
     let redactTimeout = ref(null)
@@ -44,15 +56,15 @@
         }, 1000)
     }
 
-    const showPopup = (x, y, text) => {
-        popup.value.style.left = `${x - 50}px`
-        popup.value.style.top = `${y - 50}px`
-        popup.value.textContent = text
-        popup.value.style.display = 'block'
-    }
-
-    const hidePopup = () => {
-        popup.value.style.display = 'none'
+    const togglePopUp = (text, x, y) => {
+        if(text == null) {
+            isShowingPopup.value = false
+            return
+        }
+        popUpCoords.value = { x, y }
+        initialScrollY.value = pdfContainer.value.scrollTop
+        initialPopupY.value = y
+        isShowingPopup.value = true
     }
 
     const redactFileData = async () => {
@@ -60,14 +72,14 @@
             console.error('No file to redact')
             return
         }
-        
-        isLoading.value = true
 
         if (currentOptions.value.length === 0) {
             console.log('No redaction options, resetting file')
             currentFile.value = originalFile.value
             return
         }
+        
+        isLoading.value = true
 
         try {
             const formData = new FormData()
@@ -115,13 +127,15 @@
         currentFilename.value = null
     }
 
-    // onMounted(() => {
-    //     if (pdfContainer.value) {
-    //         pdfContainer.value.addEventListener('scroll', () => {
-    //             console.log('pdfContainer scrolled')
-    //         });
-    //     }
-    // });
+    watch(() => pdfContainer.value, () => {
+        if (pdfContainer.value) {
+            pdfContainer.value.addEventListener('scroll', () => {
+                let x = popUpCoords.value.x - pdfContainer.value.scrollLeft
+                let y = initialPopupY.value - pdfContainer.value.scrollTop + initialScrollY.value
+                popUpCoords.value = { x: x, y: y }
+            })
+        }
+    })
 </script>
 
 <template>
@@ -136,7 +150,7 @@
         </div>
         <div class="optionsContainer">
             <div class="options">
-                <OptionList @options-updated="onOptionsUpdate" />
+                <OptionList ref="optionList" @options-updated="onOptionsUpdate" />
             </div>
             <div class="actions">
                 <span @click="resetFile()">Start forfra</span>
@@ -145,8 +159,7 @@
         </div>
         
     </div>
-    
-    <div ref="popup" class="popup"></div>
+    <Popup :ref="popup" :isVisible="isShowingPopup" :x="popUpCoords.x" :y="popUpCoords.y" @redact-text-selection="onRedactTextSelection" />
 </template>
 
 <style scoped>
@@ -213,15 +226,4 @@
         .actions span:hover {
             background-color: #91b2d5;
         }
-
-    .popup {
-        position: absolute;
-        display: none;
-        background: #fff;
-        border: 1px solid #ccc;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-        border-radius: 0.5rem;
-        padding: 0.8rem;
-    }
 </style>

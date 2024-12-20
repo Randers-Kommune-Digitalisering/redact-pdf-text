@@ -1,10 +1,18 @@
+<script>
+    const options = ref([
+            { id: 1, value: "" }
+    ])
+    function addOption(text){
+        console.log('Adding option:', text)
+        options.value.push({ id: options.value.length + 1, value: text ?? "" })
+    }
+    export default {
+        addOption
+    }
+</script>
 <script setup>
     import { ref, watch } from 'vue'
     const emit = defineEmits(['options-updated'])
-
-    const options = ref([
-        { id: 1, value: "" }
-    ])
 
     const redactCpr = ref(false)
     const redactCprRegex = "((((0[1-9]|[12][0-9]|3[01])(0[13578]|10|12)(\\d{2}))|(([0][1-9]|[12][0-9]|30)(0[469]|11)(\\d{2}))|((0[1-9]|1[0-9]|2[0-8])(02)(\\d{2}))|((29)(02)(00))|((29)(02)([2468][048]))|((29)(02)([13579][26])))[-]*\\d{4})/regex"
