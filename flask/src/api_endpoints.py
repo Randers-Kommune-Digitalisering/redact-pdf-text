@@ -1,7 +1,6 @@
 import logging
 import fitz  # PyMuPDF
 import re
-import base64
 import json
 
 from flask import Blueprint, jsonify
@@ -23,14 +22,14 @@ def redact_pdf():
     try:
         input_pdf = request.files['file'].read()
         logger.info(f"Received PDF file of size: {len(input_pdf)} bytes")
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "message": "File not provided or invalid"}), 400
 
     # Check if the request contains regex pattern(s)
     try:
         regex_pattern = request.form.get('pattern')
         logger.warning(f"Received regex pattern: {regex_pattern}")
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "message": "Regex pattern not provided"}), 400
 
     try:
@@ -43,14 +42,14 @@ def redact_pdf():
 
     if not regex_pattern or not all(regex_pattern):
         return jsonify({"success": False, "message": "Regex pattern(s) invalid"}), 400
-    
+
     replacement = request.form.get('replacement', None)
 
     # Load the PDF file
     try:
         doc = fitz.open(stream=input_pdf, filetype="pdf")
         output_stream = io.BytesIO()
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "message": "Error loading PDF file"}), 400
 
     # Loop through each page

@@ -28,4 +28,3 @@ def test_metrics(client):
     response = client.get('/metrics')
     assert response.status_code == 200
     assert 'is_ready gauge\nis_ready{error_type="None",job_name="test-pod"} 1.0' in response.text
-    
