@@ -21,7 +21,7 @@ RUN addgroup --gid $GROUP_ID $GROUP_NAME && \
 
 # Install packages
 RUN apk update
-RUN apk add musl-dev gcc libpq-dev mariadb-connector-c-dev postgresql-dev python3-dev make swig g++
+RUN apk add musl-dev gcc libpq-dev mariadb-connector-c-dev postgresql-dev python3-dev make swig g++ tesseract-ocr leptonica
 
 # Set working dir
 WORKDIR $HOME
