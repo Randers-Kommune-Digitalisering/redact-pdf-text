@@ -83,7 +83,7 @@
             const formData = new FormData()
             formData.append('file', originalFile.value)
             formData.append('pattern', JSON.stringify(currentOptions.value))
-            const response = await fetch('http://localhost:3000/api/redact', {
+            const response = await fetch('/api/redact', {
                 method: 'POST',
                 body: formData
             })
