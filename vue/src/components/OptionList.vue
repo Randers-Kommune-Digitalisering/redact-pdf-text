@@ -32,7 +32,7 @@
         var optionList = options.value.map(option => option.value)
 
         if (redactCpr.value)
-            optionList.push(redactDateRegex)
+            optionList.push(redactCprRegex)
 
         optionList = optionList.filter(option => option.trim() !== "")
 
