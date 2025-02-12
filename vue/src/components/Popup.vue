@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, defineProps, watch } from 'vue'
+    import { ref, watch } from 'vue'
 
     const xOffset = -10
     const yOffset = -50
