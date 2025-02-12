@@ -82,6 +82,9 @@
         padding: 0 0.5rem;
         font-size: 1em;
     }
+    label {
+        width: 100%;
+    }
 
     .redact-cpr {
         display: flex;
