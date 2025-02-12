@@ -93,6 +93,9 @@
         background-color: #efd6d6;
         padding: 0.5rem;
         border-radius: 0.25rem;
+        border: 0.05rem solid #c7c7c7;
+        box-shadow: 0 0px 5px rgba(0, 0, 0, 0.03);
+        line-height: 1.8em;
     }
     .redact-cpr.green {
         background-color: #d6efd6;
