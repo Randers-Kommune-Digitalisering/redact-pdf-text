@@ -44,23 +44,18 @@
 </script>
 
 <template>
-    <div ref="popup" class="popup" @click="redactText()">+ Anonymiser</div>
+    <div ref="popup" class="popup button" @click="redactText()">+ Anonymiser</div>
 </template>
 
 <style scoped>
     .popup {
         font-size: 0.8em;
         position: absolute;
-        background-color: #eeeeee;
         display: none;
         box-shadow: 0 0px 5px rgba(0, 0, 0, 0.2);
         z-index: 1000;
-        border-radius: 0.5rem;
-        padding: 0.8rem;
-        cursor: pointer;
-        transition: background-color 0.3s;
     }
     .popup:hover {
-        background-color: #dddddd;
+        background-color: #e6e6e6;
     }
 </style>

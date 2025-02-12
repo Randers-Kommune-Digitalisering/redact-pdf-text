@@ -18,3 +18,28 @@ body
 {
     scrollbar-gutter: stable; /* Use scrollbar-gutter property */
 }
+
+input {
+    border: none;
+    padding: 0.8rem;
+    font-size: 0.8em;
+    background-color: #f8f8f8;
+    transition: background-color 0.2s;
+    border: 0.05rem solid #c7c7c7;
+    box-shadow: 0 0px 5px rgba(0, 0, 0, 0.05);
+}
+button, .button {
+    border: none;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    font-size: 0.8em;
+    background-color: #f8f8f8;
+    border-radius: 0.4rem;
+    padding: 0.8rem;
+    transition: background-color 0.2s;
+    border: 0.05rem solid #c7c7c7;
+    box-shadow: 0 0px 5px rgba(0, 0, 0, 0.05);
+}
+button:hover, .button:hover {
+    background-color: #e6e6e6;
+}

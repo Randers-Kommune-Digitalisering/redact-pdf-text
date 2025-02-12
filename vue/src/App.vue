@@ -152,8 +152,12 @@
                 <OptionList ref="optionList" @options-updated="onOptionsUpdate" />
             </div>
             <div class="actions">
-                <span @click="resetFile()">Start forfra</span>
-                <span @click="downloadFile()">Download</span>
+                <span @click="resetFile()" class="button">
+                    <div class="icon-container"><i class="fa-solid fa-rotate-left"></i></div>
+                    Start forfra</span>
+                <span @click="downloadFile()" class="button yellow">
+                    <div class="icon-container"><i class="fa-solid fa-download"></i></div>
+                    Download</span>
             </div>
         </div>
         
@@ -215,14 +219,34 @@
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
+        margin-top:1rem;
     }
-        .actions span {
-            cursor: pointer;
-            background-color: #9fc0e4;
-            padding: 0.5rem 1rem;
-            border-radius: 0.3rem;
-        }
-        .actions span:hover {
-            background-color: #91b2d5;
-        }
+    .actions > span {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .actions > .button {
+        font-size: 1em;
+    }
+    .actions > .button.yellow {
+        background-color: #e8eed2;
+    }
+    .actions > .button.yellow:hover {
+        background-color: #dfe4c6;
+    }
+    .actions > .button.green {
+        background-color: #d6efd6;
+    }
+    .actions > .button.green:hover {
+        background-color: #c7e7c7;
+    }
+    .icon-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .fa-solid {
+        color: #2b2b2b;
+        font-size: 0.7em;
+    }
 </style>
