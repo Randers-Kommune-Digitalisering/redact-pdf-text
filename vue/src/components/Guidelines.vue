@@ -1,48 +1,43 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { marked } from 'marked'
+import axios from 'axios'
+
 const isShowingGuidelines = ref(true)
 const dontShowAgain = ref(false)
+const guidelinesContent = ref('')
 
 const closeGuidelines = () => {
     isShowingGuidelines.value = false
 }
+
+const fetchGuidelines = async () => {
+    try {
+        const response = await axios.get('/guidelines.md')
+        guidelinesContent.value = marked(response.data)
+    } catch (error) {
+        console.error('Error fetching guidelines:', error)
+    }
+}
+
+onMounted(() => {
+    fetchGuidelines()
+})
 </script>
 
 <template>
     <div class="guidelines" v-if="isShowingGuidelines" @click="closeGuidelines">
         <div @click.stop>
-            <h2>Vejledning – Randers Kommunes anonymiseringsværktøj</h2>
-
-            <p>Randers Kommunes anonymiseringsværktøj hjælper medarbejdere med at maskere ord og sætninger i en pdf-fil, så de permanent skjules og ikke kan genskabes. Værktøjet kan blandt andet bruges til at fjerne persondata fra dokumenter i overensstemmelse med gældende lovgivning om databeskyttelse.</p>
-
-            <h3>Sådan bruger du værktøjet:</h3>
-
-            <ol>
-            <li>Upload den ønskede pdf-fil.</li>
-            <li>Marker de ord eller sætninger, der skal anonymiseres, og klik på Anonymiser.</li>
-            <li>Hvis dokumentet indeholder CPR-numre, kan du vælge at krydse feltet Anonymiser CPR-numre af for at fjerne dem automatisk.</li>
-            <li>Gem den anonymiserede fil og verificér resultatet.</li>
-            </ol>
-
-            <h3>Det er brugerens ansvar at</h3>
-
-            <ul>
-            <li>Gennemlæse dokumentet grundigt efter anonymisering for at sikre, at alle relevante oplysninger, såsom CPR-numre, navne og andre følsomme data, er fjernet.</li>
-            <li>Følge Randers Kommunes databeskyttelsespolitikker og de gældende regler for håndtering af personoplysninger, herunder GDPR.</li>
-            </ul>
-
-            <h3>Sletning af original fil</h3>
-
-            <p>Når arbejdet er færdigt, skal den originale fil, hvis den indeholder persondata, slettes fra computeren i overensstemmelse med Randers Kommunes sletteregler. Dette er en vigtig del af at sikre korrekt databeskyttelse.</p>
-        
+            <div v-html="guidelinesContent"></div>
             <div class="buttons">
-                <div :class="['dontShowAgain', { 'green': dontShowAgain }]" v-if="false">
-                    <input type="checkbox" id="dontShowAgain" name="dontShowAgain" value="dontShowAgain" v-model="dontShowAgain" />
-                    <label for="dontShowAgain"><div>Vis ikke denne vejledning igen</div></label>
-                </div>
-                <button @click="closeGuidelines" class="yellow">Bekræft og fortsæt</button>
+            <div :class="['dontShowAgain', { 'green': dontShowAgain }]" v-if="false">
+                <input type="checkbox" id="dontShowAgain" name="dontShowAgain" value="dontShowAgain" v-model="dontShowAgain" />
+                <label for="dontShowAgain"><div>Vis ikke denne vejledning igen</div></label>
             </div>
+            <button @click="closeGuidelines" class="yellow">Bekræft og fortsæt</button>
         </div>
+        </div>
+        
     </div>
 </template>
 
