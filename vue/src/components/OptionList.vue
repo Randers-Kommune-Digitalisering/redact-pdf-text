@@ -113,7 +113,7 @@ export default {
         padding: 0.6rem 0.8rem;
     }
     .delete > button:hover {
-        background-color: #bdbdbd;
+        background-color: #ffe6e6;
     }
     .fa-solid {
         color: #2b2b2b;
