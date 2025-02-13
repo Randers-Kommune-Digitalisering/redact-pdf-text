@@ -1,4 +1,4 @@
-# Projektnavn  `README.md`
+# Anonymiseringsværktøj `redact-pdf-text`
 [**Formål**](#formål) | [**Beskrivelse**](#beskrivelse) | [**Afhængigheder**](#afh%C3%A6ngigheder) | [**Udvikling**](#udvikling)
 
 ## Formål
