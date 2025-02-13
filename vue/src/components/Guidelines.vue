@@ -58,7 +58,8 @@
             <div class="buttons">
             <div :class="['dontShowAgain', { 'green': dontShowAgain }]">
                 <input type="checkbox" id="dontShowAgain" name="dontShowAgain" value="dontShowAgain" v-model="dontShowAgain" />
-                <label for="dontShowAgain"><div>Vis ikke denne vejledning igen</div></label>
+                <label for="dontShowAgain" v-if="!dontShowAgain"><div>Vis ikke denne vejledning igen</div></label>
+                <label for="dontShowAgain" v-if="dontShowAgain"><div>Vejledningen skjules i en uge</div></label>
             </div>
             <button @click="closeGuidelines(false)" class="yellow">Bekræft og fortsæt</button>
         </div>
