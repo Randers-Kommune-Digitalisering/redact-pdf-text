@@ -144,23 +144,33 @@
     <div class="mainContainer" v-if="currentFile != null">
 
         <div ref="pdfContainer" :class="['pdfContainer', { 'no-scroll': isLoading }]">
+
             <div class="loading-screen" v-if="isLoading">
                 <span>Indlæser ...</span>
             </div>
             <PdfViewer :ref="pdfViewer" :source="currentFile" @loading-complete="onLoadingComplete" @text-selected="onSelectText" />
+
         </div>
         <div class="optionsContainer">
+            
+            <div class="info"><span @click="Guidelines.showGuidelines()" class="button yellow">
+                <div class="icon-container"><i class="fa-solid fa-info"></i></div>
+            </span></div>
+
             <div class="options">
                 <OptionList ref="optionList" @options-updated="onOptionsUpdate" />
             </div>
-            <div class="actions">
+            <div class="actions">                
                 <span @click="resetFile()" class="button">
                     <div class="icon-container"><i class="fa-solid fa-rotate-left"></i></div>
-                    Start forfra</span>
-                <span @click="downloadFile()" class="button yellow">
+                    Start forfra
+                </span>
+                <span @click="downloadFile()" class="button blue">
                     <div class="icon-container"><i class="fa-solid fa-download"></i></div>
-                    Download</span>
+                    Download
+                </span>
             </div>
+
         </div>
         
     </div>
@@ -215,6 +225,18 @@
     .options {
         flex-grow: 1;
     }
+    .info {
+        position: fixed;
+        right: 2rem;
+        margin-top: 0.5rem;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+    }
+    .info > .button {
+        border-radius: 1.2rem;
+        padding: 0.5rem 0.8rem;
+    }
     .actions {
         display: flex;
         align-items: center;
@@ -229,28 +251,14 @@
     .actions > .button {
         font-size: 1em;
     }
-    .actions > .button.yellow {
-        background-color: #e8eed2;
-    }
-    .actions > .button.yellow:hover {
-        background-color: #dfe4c6;
-    }
-    .actions > .button.green {
-        background-color: #d6efd6;
-    }
-    .actions > .button.green:hover {
-        background-color: #c7e7c7;
-    }
-    .actions > .button.red {
-        background-color: #efd6d6;
-    }
-    .actions > .button.red:hover {
-        background-color: #e7c7c7;
-    }
     .icon-container {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+    }
+    .info .fa-solid {
+        font-size: 1em;
+        transform: translateY(0.05rem);
     }
     .fa-solid {
         color: #2b2b2b;

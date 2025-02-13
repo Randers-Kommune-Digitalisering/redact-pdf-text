@@ -1,40 +1,66 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { marked } from 'marked'
-import axios from 'axios'
+    import { ref, onMounted } from 'vue'
+    import { marked } from 'marked'
+    import axios from 'axios'
+    import { useCookies } from 'vue3-cookies'
 
-const isShowingGuidelines = ref(true)
-const dontShowAgain = ref(false)
-const guidelinesContent = ref('')
+    onMounted(() => {
+        const dontShow = cookies.get(cookieName)
+        if (dontShow)
+            isShowingGuidelines.value = false
+        else 
+            fetchGuidelines()
+    })
+</script>
+<script>
+    const isShowingGuidelines = ref(true)
+    const dontShowAgain = ref(false)
+    const { cookies } = useCookies()
+    const cookieName = 'rk_anonymisering_dontShowGuidelines'
 
-const closeGuidelines = () => {
-    isShowingGuidelines.value = false
-}
+    const guidelinesContent = ref('')
 
-const fetchGuidelines = async () => {
-    try {
-        const response = await axios.get('/guidelines.md')
-        guidelinesContent.value = marked(response.data)
-    } catch (error) {
-        console.error('Error fetching guidelines:', error)
+    const fetchGuidelines = async () => {
+        try {
+            const response = await axios.get('/guidelines.md')
+            guidelinesContent.value = marked(response.data)
+        } catch (error) {
+            console.error('Error fetching guidelines:', error)
+        }
     }
-}
 
-onMounted(() => {
-    fetchGuidelines()
-})
+    const closeGuidelines = (ignoreSelection = false) => {
+        if (!ignoreSelection && dontShowAgain.value)
+            cookies.set(cookieName, true, '7d')
+        else if (!ignoreSelection)
+            cookies.remove(cookieName)
+        
+        isShowingGuidelines.value = false
+    }
+
+    const showGuidelines = () => {
+        if (!guidelinesContent.value)
+            fetchGuidelines()
+        
+        isShowingGuidelines.value = true
+        dontShowAgain.value = false
+    }
+
+    export default {
+        showGuidelines
+    }
 </script>
 
 <template>
-    <div class="guidelines" v-if="isShowingGuidelines" @click="closeGuidelines">
+    <div class="guidelines" v-if="isShowingGuidelines" @click="closeGuidelines(true)">
         <div @click.stop>
             <div v-html="guidelinesContent"></div>
             <div class="buttons">
-            <div :class="['dontShowAgain', { 'green': dontShowAgain }]" v-if="false">
+            <div :class="['dontShowAgain', { 'green': dontShowAgain }]">
                 <input type="checkbox" id="dontShowAgain" name="dontShowAgain" value="dontShowAgain" v-model="dontShowAgain" />
                 <label for="dontShowAgain"><div>Vis ikke denne vejledning igen</div></label>
             </div>
-            <button @click="closeGuidelines" class="yellow">Bekræft og fortsæt</button>
+            <button @click="closeGuidelines(false)" class="yellow">Bekræft og fortsæt</button>
         </div>
         </div>
         
@@ -80,17 +106,5 @@ onMounted(() => {
 }
 .dontShowAgain > label {
     transform: translateY(-0.03rem);
-}
-button.green {
-    background-color: #d6efd6;
-}
-button.green:hover {
-    background-color: #c7e7c7;
-}
-button.yellow {
-        background-color: #e8eed2;
-}
-button.yellow:hover {
-    background-color: #dfe4c6;
 }
 </style>

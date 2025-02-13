@@ -43,3 +43,27 @@ button, .button {
 button:hover, .button:hover {
     background-color: #e6e6e6;
 }
+.button.yellow, button.yellow {
+    background-color: #f7f1d1;
+}
+.button.yellow:hover, button.yellow:hover {
+    background-color: #e4e1c6;
+}
+.button.green, button.green {
+    background-color: #d6efd6;
+}
+.button.green:hover, button.green:hover {
+    background-color: #c7e7c7;
+}
+.button.red, button.red {
+    background-color: #efd6d6;
+}
+.button.red:hover, button.red:hover {
+    background-color: #e7c7c7;
+}
+.button.blue, button.blue {
+    background-color: #d6e9ef;
+}
+.button.blue:hover, button.blue:hover {
+    background-color: #c7e1e7;
+}

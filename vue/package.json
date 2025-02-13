@@ -15,7 +15,8 @@
     "npm": "^11.0.0",
     "pdf-viewer-vue": "^0.2.7",
     "vue": "^3.3.4",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue3-cookies": "^1.0.6"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.3.4",

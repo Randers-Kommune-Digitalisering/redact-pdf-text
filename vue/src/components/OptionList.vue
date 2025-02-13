@@ -1,17 +1,3 @@
-<script>
-    const options = ref([
-            { id: 1, value: "" }
-    ])
-    function addOption(text){
-        options.value.push({ id: options.value.length + 1, value: text ?? "" })
-    }
-    function resetOptions(){
-        options.value = [{ id: 1, value: "" }]
-    }
-    export default {
-        addOption, resetOptions
-    }
-</script>
 <script setup>
     import { ref, watch } from 'vue'
     const emit = defineEmits(['options-updated'])
@@ -38,6 +24,20 @@
 
         emit('options-updated', optionList)
     }
+</script>
+<script>
+const options = ref([
+        { id: 1, value: "" }
+])
+function addOption(text){
+    options.value.push({ id: options.value.length + 1, value: text ?? "" })
+}
+function resetOptions(){
+    options.value = [{ id: 1, value: "" }]
+}
+export default {
+    addOption, resetOptions
+}
 </script>
 
 <template>
