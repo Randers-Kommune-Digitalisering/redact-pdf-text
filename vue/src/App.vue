@@ -3,6 +3,7 @@
     import PdfViewer from './components/PdfViewer.vue'
     import OptionList from './components/OptionList.vue'
     import Popup from './components/Popup.vue'
+    import Guidelines from './components/Guidelines.vue'
     import { ref, watch } from 'vue'
 
     const pdfContainer = ref(null)
@@ -138,6 +139,7 @@
 </script>
 
 <template>
+    <Guidelines />
     <FileDrop @files-dropped="onFileDrop" v-if="currentFile == null" />
     <div class="mainContainer" v-if="currentFile != null">
 
@@ -176,7 +178,6 @@
         scrollbar-gutter: stable; /* Use scrollbar-gutter property */
         overflow-x: hidden;
     }
-    
     .pdfContainer {
         width: 60%;
     }
@@ -239,6 +240,12 @@
     }
     .actions > .button.green:hover {
         background-color: #c7e7c7;
+    }
+    .actions > .button.red {
+        background-color: #efd6d6;
+    }
+    .actions > .button.red:hover {
+        background-color: #e7c7c7;
     }
     .icon-container {
         display: flex;
