@@ -6,13 +6,13 @@ Randers Kommunes anonymiseringsværktøj hjælper medarbejdere med at maskere or
 
 1. Upload den ønskede pdf-fil. 
 
-2. Marker de ord eller sætninger, der skal anonymiseres, og klik på Anonymiser. 
+2. Marker de ord eller sætninger, der skal anonymiseres, og klik på "Anonymiser".
 
-3. Hvis dokumentet indeholder CPR-numre, kan du vælge at krydse feltet Anonymiser CPR-numre af for at fjerne dem automatisk. 
+3. Hvis dokumentet indeholder CPR-numre, kan du vælge at krydse feltet "Anonymiser CPR-numre" af for at fjerne dem automatisk.
 
 4. Gem den anonymiserede fil og verificér resultatet. 
 
-### Det er brugerens ansvar at 
+### Det er brugerens ansvar at:
 
 - Gennemlæse dokumentet grundigt efter anonymisering for at sikre, at alle relevante oplysninger, såsom CPR-numre, navne og andre følsomme data, er fjernet. 
 

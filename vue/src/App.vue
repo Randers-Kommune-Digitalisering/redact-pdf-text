@@ -258,7 +258,7 @@
     }
     .info .fa-solid {
         font-size: 1em;
-        transform: translateY(0.05rem);
+        transform: translateY(-0.03rem);
     }
     .fa-solid {
         color: #2b2b2b;
