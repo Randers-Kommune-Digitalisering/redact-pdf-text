@@ -18,3 +18,52 @@ body
 {
     scrollbar-gutter: stable; /* Use scrollbar-gutter property */
 }
+
+input {
+    border: none;
+    padding: 0.8rem;
+    font-size: 0.8em;
+    background-color: #f8f8f8;
+    transition: background-color 0.2s;
+    border: 0.05rem solid #c7c7c7;
+    box-shadow: 0 0px 5px rgba(0, 0, 0, 0.03);
+}
+button, .button {
+    border: none;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    font-size: 0.8em;
+    background-color: #f8f8f8;
+    border-radius: 0.4rem;
+    padding: 0.8rem;
+    transition: background-color 0.2s;
+    border: 0.05rem solid #c7c7c7;
+    box-shadow: 0 0px 5px rgba(0, 0, 0, 0.03);
+}
+button:hover, .button:hover {
+    background-color: #e6e6e6;
+}
+.button.yellow, button.yellow {
+    background-color: #f7f1d1;
+}
+.button.yellow:hover, button.yellow:hover {
+    background-color: #e4e1c6;
+}
+.button.green, button.green {
+    background-color: #d6efd6;
+}
+.button.green:hover, button.green:hover {
+    background-color: #c7e7c7;
+}
+.button.red, button.red {
+    background-color: #efd6d6;
+}
+.button.red:hover, button.red:hover {
+    background-color: #e7c7c7;
+}
+.button.blue, button.blue {
+    background-color: #d6e9ef;
+}
+.button.blue:hover, button.blue:hover {
+    background-color: #c7e1e7;
+}

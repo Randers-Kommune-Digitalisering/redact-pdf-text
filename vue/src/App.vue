@@ -3,6 +3,7 @@
     import PdfViewer from './components/PdfViewer.vue'
     import OptionList from './components/OptionList.vue'
     import Popup from './components/Popup.vue'
+    import Guidelines from './components/Guidelines.vue'
     import { ref, watch } from 'vue'
 
     const pdfContainer = ref(null)
@@ -138,23 +139,38 @@
 </script>
 
 <template>
+    <Guidelines />
     <FileDrop @files-dropped="onFileDrop" v-if="currentFile == null" />
     <div class="mainContainer" v-if="currentFile != null">
 
         <div ref="pdfContainer" :class="['pdfContainer', { 'no-scroll': isLoading }]">
+
             <div class="loading-screen" v-if="isLoading">
                 <span>Indlæser ...</span>
             </div>
             <PdfViewer :ref="pdfViewer" :source="currentFile" @loading-complete="onLoadingComplete" @text-selected="onSelectText" />
+
         </div>
         <div class="optionsContainer">
+            
+            <div class="info"><span @click="Guidelines.showGuidelines()" class="button yellow">
+                <div class="icon-container"><i class="fa-solid fa-info"></i></div>
+            </span></div>
+
             <div class="options">
                 <OptionList ref="optionList" @options-updated="onOptionsUpdate" />
             </div>
-            <div class="actions">
-                <span @click="resetFile()">Start forfra</span>
-                <span @click="downloadFile()">Download</span>
+            <div class="actions">                
+                <span @click="resetFile()" class="button">
+                    <div class="icon-container"><i class="fa-solid fa-rotate-left"></i></div>
+                    Start forfra
+                </span>
+                <span @click="downloadFile()" class="button blue">
+                    <div class="icon-container"><i class="fa-solid fa-download"></i></div>
+                    Download
+                </span>
             </div>
+
         </div>
         
     </div>
@@ -172,7 +188,6 @@
         scrollbar-gutter: stable; /* Use scrollbar-gutter property */
         overflow-x: hidden;
     }
-    
     .pdfContainer {
         width: 60%;
     }
@@ -210,19 +225,43 @@
     .options {
         flex-grow: 1;
     }
+    .info {
+        position: fixed;
+        right: 2rem;
+        margin-top: 0.5rem;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+    }
+    .info > .button {
+        border-radius: 1.2rem;
+        padding: 0.5rem 0.8rem;
+    }
     .actions {
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
+        margin-top:1rem;
     }
-        .actions span {
-            cursor: pointer;
-            background-color: #9fc0e4;
-            padding: 0.5rem 1rem;
-            border-radius: 0.3rem;
-        }
-        .actions span:hover {
-            background-color: #91b2d5;
-        }
+    .actions > span {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .actions > .button {
+        font-size: 1em;
+    }
+    .icon-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .info .fa-solid {
+        font-size: 1em;
+        transform: translateY(0.05rem);
+    }
+    .fa-solid {
+        color: #2b2b2b;
+        font-size: 0.7em;
+    }
 </style>

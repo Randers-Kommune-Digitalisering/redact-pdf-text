@@ -1,17 +1,3 @@
-<script>
-    const options = ref([
-            { id: 1, value: "" }
-    ])
-    function addOption(text){
-        options.value.push({ id: options.value.length + 1, value: text ?? "" })
-    }
-    function resetOptions(){
-        options.value = [{ id: 1, value: "" }]
-    }
-    export default {
-        addOption, resetOptions
-    }
-</script>
 <script setup>
     import { ref, watch } from 'vue'
     const emit = defineEmits(['options-updated'])
@@ -39,6 +25,20 @@
         emit('options-updated', optionList)
     }
 </script>
+<script>
+const options = ref([
+        { id: 1, value: "" }
+])
+function addOption(text){
+    options.value.push({ id: options.value.length + 1, value: text ?? "" })
+}
+function resetOptions(){
+    options.value = [{ id: 1, value: "" }]
+}
+export default {
+    addOption, resetOptions
+}
+</script>
 
 <template>
     <div class="optionsParent">
@@ -50,10 +50,10 @@
         <div v-for="option in options" :key="option.id" class="option">
             <input type="text" v-model="option.value" placeholder="Tekst der skal anonymiseres .." />
             <span class="delete">
-                <button @click="options.splice(options.indexOf(option), 1)">X</button>
+                <button @click="options.splice(options.indexOf(option), 1)"><i class="fa-regular fa-trash-can"></i></button>
             </span>
         </div>
-        <button @click="options.push({ id: options.length + 1, value: '' })">Tilføj anonymisering</button>
+        <button @click="options.push({ id: options.length + 1, value: '' })">+ Tilføj anonymisering</button>
     </div>
 </template>
 
@@ -67,20 +67,23 @@
     .optionsParent {
         display: flex;
         flex-direction: column;
-        gap: 0.8rem;
+        gap: 0.6rem;
         padding-top: 0.8rem;
         padding-left: 0.3rem;
     }
     .option {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: 0.6rem;
     }
     .option input {
         width: 100%;
         line-height: 2em;
         padding: 0 0.5rem;
         font-size: 1em;
+    }
+    label {
+        width: 100%;
     }
 
     .redact-cpr {
@@ -90,6 +93,9 @@
         background-color: #efd6d6;
         padding: 0.5rem;
         border-radius: 0.25rem;
+        border: 0.05rem solid #c7c7c7;
+        box-shadow: 0 0px 5px rgba(0, 0, 0, 0.03);
+        line-height: 1.8em;
     }
     .redact-cpr.green {
         background-color: #d6efd6;
@@ -102,14 +108,14 @@
         align-items: center;
         justify-content: center;
     }
-    button {
-        padding: 0.5rem 1rem;
-        background-color: #9fc0e4;
-        border: none;
-        cursor: pointer;
-        border-radius: 0.25rem;
-    }
     .delete > button {
-        background-color: #d7d0d0;
+        background-color: #d7d7d7;
+        padding: 0.6rem 0.8rem;
+    }
+    .delete > button:hover {
+        background-color: #bdbdbd;
+    }
+    .fa-solid {
+        color: #2b2b2b;
     }
 </style>
