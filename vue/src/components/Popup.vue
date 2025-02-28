@@ -55,7 +55,4 @@
         box-shadow: 0 0px 5px rgba(0, 0, 0, 0.2);
         z-index: 1000;
     }
-    .popup:hover {
-        background-color: #e6e6e6;
-    }
 </style>
