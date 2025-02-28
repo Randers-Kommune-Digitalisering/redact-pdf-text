@@ -74,7 +74,9 @@ def redact_pdf():
                 continue
 
             # Add a redact annotation over the found area (position)
-            page.add_redact_annot(instance, fill=(1, 0, 0))  # Set redaction color to red (RGB)
+            # Adjust the height of the redaction annotation
+            rect = fitz.Rect(instance.x0, instance.y0 + 5, instance.x1, instance.y1 - 3)
+            page.add_redact_annot(rect, fill=(1, 0, 0))  # Set redaction color to red (RGB)
             page.apply_redactions()
 
             # Add a text annotation to overlay the redacted text
