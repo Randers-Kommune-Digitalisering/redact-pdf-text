@@ -36,7 +36,7 @@
     }
 
     const onRedactTextSelection = () => {
-        OptionList.addOption(currentSelectedText.value)
+        OptionList.addOption(currentSelectedText.value.trim())
     }
 
     let redactTimeout = ref(null)
