@@ -1,13 +1,24 @@
 <script setup>
     import { ref, onMounted, onUnmounted } from 'vue'
+    import Notification from './Notification.vue'
+
     const emit = defineEmits(['files-dropped'])
     const isDragging = ref(false)
+    const showErrorNotification = ref(false)
 
     function onDrop(e) {
         e.preventDefault()
         isDragging.value = false
         const files = [...e.dataTransfer.files]
-        emit('files-dropped', files)
+        const pdfFiles = files.filter(file => file.type === 'application/pdf')
+        if (pdfFiles.length > 0) {
+            emit('files-dropped', pdfFiles)
+        } else {
+            showErrorNotification.value = true
+            setTimeout(() => {
+                showErrorNotification.value = false
+            }, 8000)
+        }
     }
 
     function preventDefaults(e) {
@@ -54,9 +65,10 @@
     <div class="dropOverlay">
         <div>
             <div class="header">Træk og slip</div>
-            <div class="subheader">en PDF-fil her for at starte</div>
+            <div class="subheader">en <span class="heavy">PDF</span>-fil her for at starte</div>
         </div>
     </div>
+    <Notification title="Forkert filtype" text="Det er kun muligt at anonymisere PDF-filer" v-if="showErrorNotification" />
 </template>
 
 <style scoped>
@@ -98,5 +110,8 @@
     }
     .dropOverlay .subheader {
         font-size: 1.5em;
+    }
+    .heavy {
+        font-weight: 400;
     }
 </style>
