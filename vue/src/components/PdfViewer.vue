@@ -44,9 +44,8 @@
         }
     }
 
-    const renderPage = (page, pdf) => {
+    const renderPage = async (page) => {
         const containerWidth = pdfViewerContainer.value.clientWidth
-        //console.log("containerWidth", containerWidth)
         const viewport = page.getViewport({ scale: 1 })
         const scale = containerWidth / viewport.width
         const scaledViewport = page.getViewport({ scale })
@@ -65,30 +64,29 @@
             viewport: scaledViewport
         }
 
-        page.render(renderContext).promise.then(() => {
-            const textLayerDiv = document.createElement('div')
-            textLayerDiv.className = 'textLayer'
-            textLayerDiv.style.height = `${scaledViewport.height}px`
-            textLayerDiv.style.width = `${containerWidth}px`
-            textLayerDiv.style.position = 'absolute'
-            textLayerDiv.style.top = '0'
-            textLayerDiv.style.left = '0'
+        await page.render(renderContext).promise
 
-            page.getTextContent().then(textContent => {
-                pdfjsLib.renderTextLayer({
-                    textContent: textContent,
-                    container: textLayerDiv,
-                    viewport: scaledViewport,
-                    textDivs: []
-                })
+        const textLayerDiv = document.createElement('div')
+        textLayerDiv.className = 'textLayer'
+        textLayerDiv.style.height = `${scaledViewport.height}px`
+        textLayerDiv.style.width = `${containerWidth}px`
+        textLayerDiv.style.position = 'absolute'
+        textLayerDiv.style.top = '0'
+        textLayerDiv.style.left = '0'
 
-                textLayerDiv.addEventListener('mouseup', onTextLayerMouseUp)
-            })
-
-            pageContainer.appendChild(canvas)
-            pageContainer.appendChild(textLayerDiv)
-            pdfViewerContainer.value.appendChild(pageContainer)
+        const textContent = await page.getTextContent()
+        pdfjsLib.renderTextLayer({
+            textContent: textContent,
+            container: textLayerDiv,
+            viewport: scaledViewport,
+            textDivs: []
         })
+
+        textLayerDiv.addEventListener('mouseup', onTextLayerMouseUp)
+
+        pageContainer.appendChild(canvas)
+        pageContainer.appendChild(textLayerDiv)
+        pdfViewerContainer.value.appendChild(pageContainer)
     }
 
     const debounce = (func, wait) => {
@@ -104,25 +102,21 @@
             return
 
         const reader = new FileReader()
-        reader.onload = function(event) {
+        reader.onload = async function(event) {
             const arrayBuffer = event.target.result
             const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) })
-
-            loadingTask.promise.then(pdf =>
-            {
+        
+            try {
+                const pdf = await loadingTask.promise;
                 pdfViewerContainer.value.innerHTML = '' // Clear previous content
                 for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                    pdf.getPage(pageNum).then(page => {
-                        renderPage(page, pdf)
-                    })
+                    const page = await pdf.getPage(pageNum)
+                    await renderPage(page)
                 }
-            })
-            .then(() => {
                 notifyLoadingComplete()
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error loading PDF:', error)
-            })
+            }
         }
         reader.readAsArrayBuffer(props.source)
     }
