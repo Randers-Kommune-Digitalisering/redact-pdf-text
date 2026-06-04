@@ -2,8 +2,27 @@ import base64
 import io
 import logging
 import paramiko
-import pysftp
-import warnings
+
+
+class _ParamikoSFTPConnection:
+    def __init__(self, transport, sftp):
+        self._transport = transport
+        self._sftp = sftp
+
+    def close(self):
+        try:
+            self._sftp.close()
+        finally:
+            self._transport.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.close()
+
+    def __getattr__(self, name):
+        return getattr(self._sftp, name)
 
 
 class SFTPClient:
@@ -11,11 +30,6 @@ class SFTPClient:
         self.host = host
         self.username = username
         self.password = password
-
-        cnopts = pysftp.CnOpts()
-        cnopts.hostkeys = None
-
-        self.cnopts = cnopts
 
         if key_base64:
             self.key = self._make_key(key_base64, key_pass)
@@ -33,9 +47,16 @@ class SFTPClient:
 
     def get_connection(self):
         try:
-            # Supress warning about trusting all host keys - bad practice!
-            warnings.filterwarnings('ignore', '.*Failed to load HostKeys.*')
-            return pysftp.Connection(host=self.host, username=self.username, password=self.password, private_key=self.key, cnopts=self.cnopts)
+            transport = paramiko.Transport((self.host, 22))
+            if self.key is not None and self.password is not None:
+                transport.connect(username=self.username, password=self.password, pkey=self.key)
+            elif self.key is not None:
+                transport.connect(username=self.username, pkey=self.key)
+            else:
+                transport.connect(username=self.username, password=self.password)
+
+            sftp = paramiko.SFTPClient.from_transport(transport)
+            return _ParamikoSFTPConnection(transport, sftp)
         except Exception as e:
             self.logger.error(e)
             return None

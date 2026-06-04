@@ -14,10 +14,10 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   server: {
     port: VUE_PORT,
+    watch: {
+      usePolling: process.env.CHOKIDAR_USEPOLLING === 'true',
+    },
     proxy: {
-      watch: {
-        usePolling: true,
-      },
       '/api/': {
         target: 'http://localhost:' + BACKEND_PORT + '/',
         changeOrigin: true

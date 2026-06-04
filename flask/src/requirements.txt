@@ -2,7 +2,7 @@ Flask==3.0.3
 mariadb
 pymssql
 py-healthcheck
-pysftp
+paramiko>=3
 psycopg2
 prometheus-client
 python-dotenv
