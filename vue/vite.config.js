@@ -24,6 +24,16 @@ export default defineConfig({
       }
     }
   },
+  preview: {
+    port: VUE_PORT,
+    host: true,
+    proxy: {
+      '/api/': {
+        target: 'http://localhost:' + BACKEND_PORT + '/',
+        changeOrigin: true
+      }
+    }
+  },
   plugins: [
     vue(),
   ],
