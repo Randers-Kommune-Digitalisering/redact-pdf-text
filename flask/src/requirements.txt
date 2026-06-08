@@ -1,9 +1,5 @@
 Flask==3.0.3
-mariadb
-pymssql
 py-healthcheck
-pysftp
-psycopg2
 prometheus-client
 python-dotenv
 requests==2.31.0
