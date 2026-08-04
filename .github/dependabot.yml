@@ -1,0 +1,40 @@
+# Dependabot configuration file
+# Dependabot will still create pull requests for security updates, even if the "open-pull-requests-limit" is set to 0.
+version: 2
+
+updates:
+  # Python dependencies (security updates only)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "Europe/Copenhagen"
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "pip"
+
+  # Node.js dependencies (security updates only)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "sunday"
+      time: "04:00"
+    open-pull-requests-limit: 15
+    commit-message:
+      prefix: "npm"
+    security-updates-only: true
+
+  # GitHub Actions dependencies (security updates only)
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "05:00"
+      timezone: "Europe/Copenhagen"
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "actions"
