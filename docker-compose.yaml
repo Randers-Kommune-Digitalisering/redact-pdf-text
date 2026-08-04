@@ -9,7 +9,11 @@ services:
       - "3000:3000"
     environment:
       DEBUG: True
-      CHOKIDAR_USEPOLLING: true
+      CHOKIDAR_USEPOLLING: "true"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     volumes:
       - ./vue:/app/vue:delegated
       - /app/vue/node_modules

@@ -1,27 +1,44 @@
-FROM node:20-alpine
+FROM node:23-alpine AS vue-build
 
+WORKDIR /app
+
+## Build and copy the vue app
+COPY vue .
+RUN npm install && npm run build
+
+FROM python:3.12-alpine
+
+# Set dir and user
+ENV GROUP_NAME=app
 ENV HOME=/app
-ENV FLASK_PORT=8080
-ENV VITE_PORT=3000
+ENV GROUP_ID=11000
+ENV USER_ID=11001
+ENV PORT=8080
 
-RUN  apk add python3 py3-pip musl-dev gcc libpq-dev mariadb-connector-c-dev postgresql-dev python3-dev
+# Add user
+RUN addgroup --gid $GROUP_ID $GROUP_NAME && \
+    adduser $USER_ID -u $USER_ID -D -G $GROUP_NAME -h $HOME
 
-WORKDIR $HOME/vue
+# Install packages
+RUN apk update
+RUN apk add musl-dev gcc libpq-dev python3-dev
 
-COPY ./vue/package*.json ./
+# Set working dir
+WORKDIR $HOME
 
-RUN cd $HOME/vue && npm install
+# Copy files and 
+COPY --from=vue-build /app/dist ./dist
+COPY flask/src .
 
-COPY ./vue $HOME/vue
+# Install python packages
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-WORKDIR $HOME/flask
+# Open port
+EXPOSE $PORT
 
-COPY ./flask/src $HOME/flask
+# Set user
+USER $USER_ID
 
-RUN pip install --upgrade pip --break-system-packages
-
-RUN pip install -r requirements.txt --break-system-packages
-
-EXPOSE $FLASK_PORT $VITE_PORT
-
-ENTRYPOINT ["sh", "-c", "cd /app/flask && python main.py & cd /app/vue && npm run host"]
+ENTRYPOINT ["python"]
+CMD ["main.py"]

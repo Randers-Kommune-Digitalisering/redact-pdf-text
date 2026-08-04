@@ -21,14 +21,13 @@ def redact_pdf():
     # Check if the request contains a file
     try:
         input_pdf = request.files['file'].read()
-        logger.info(f"Received PDF file of size: {len(input_pdf)} bytes")
+        logger.debug(f"Received PDF file of size: {len(input_pdf)} bytes")
     except Exception:
         return jsonify({"success": False, "message": "File not provided or invalid"}), 400
 
     # Check if the request contains regex pattern(s)
     try:
         regex_pattern = request.form.get('pattern')
-        logger.warning(f"Received regex pattern: {regex_pattern}")
     except Exception:
         return jsonify({"success": False, "message": "Regex pattern not provided"}), 400
 

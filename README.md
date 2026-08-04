@@ -88,6 +88,18 @@ For at installere og starte løsningen lokalt eller i CodeSpace, følg disse tri
     python main.py
     ```
 
+### Docker
+
+- **Udvikling (hot reload)**: `docker-compose.yaml` starter Flask + Vite dev server (fil-watching). Denne er kun tiltænkt udvikling.
+- **Produktion**: Brug [Dockerfile](Dockerfile) som bygger Vue til statiske filer og serverer dem via Flask. Det undgår Vite’s fil-watcher og dermed fejl som `EMFILE: too many open files`.
+
+Build og kør (produktion):
+
+```sh
+docker build -t redact-pdf-text .
+docker run --rm -p 8080:8080 redact-pdf-text
+```
+
 ### API Endpoints
 
 - **`POST /api/redact`**: Modtager en PDF-fil samt en liste med tekster til anonymisering. Kan modtage regex til anonymisering. Returnerer den redigerede PDF-fil.
