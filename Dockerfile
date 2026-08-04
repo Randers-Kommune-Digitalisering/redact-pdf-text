@@ -1,44 +1,44 @@
-FROM node:20-alpine AS frontend-build
+FROM node:23-alpine AS vue-build
 
-WORKDIR /app/vue
+WORKDIR /app
 
-COPY ./vue/package*.json ./
-RUN npm ci
+## Build and copy the vue app
+COPY vue .
+RUN npm install && npm run build
 
-COPY ./vue ./
-RUN npm run build
+FROM python:3.12-alpine
 
-
-FROM node:20-alpine AS runtime
-
+# Set dir and user
+ENV GROUP_NAME=app
 ENV HOME=/app
-ENV FLASK_PORT=8080
-ENV VITE_PORT=3000
+ENV GROUP_ID=11000
+ENV USER_ID=11001
+ENV PORT=8080
 
-RUN apk add --no-cache \
-	python3 \
-	py3-pip \
-	musl-dev \
-	gcc \
-	libpq-dev \
-	mariadb-connector-c-dev \
-	postgresql-dev \
-	python3-dev
+# Add user
+RUN addgroup --gid $GROUP_ID $GROUP_NAME && \
+    adduser $USER_ID -u $USER_ID -D -G $GROUP_NAME -h $HOME
 
-WORKDIR $HOME/flask
+# Install packages
+RUN apk update
+RUN apk add musl-dev gcc libpq-dev python3-dev
 
-COPY ./flask/src $HOME/flask
-COPY --from=frontend-build /app/vue/dist $HOME/flask/dist
-COPY --from=frontend-build /app/vue/dist $HOME/vue/dist
-COPY --from=frontend-build /app/vue/package*.json $HOME/vue/
-COPY --from=frontend-build /app/vue/node_modules $HOME/vue/node_modules
-COPY --from=frontend-build /app/vue/vite.config.js $HOME/vue/vite.config.js
-COPY --from=frontend-build /app/vue/index.html $HOME/vue/index.html
-COPY --from=frontend-build /app/vue/public $HOME/vue/public
+# Set working dir
+WORKDIR $HOME
 
-RUN pip install --upgrade pip --break-system-packages
-RUN pip install -r requirements.txt --break-system-packages
+# Copy files and 
+COPY --from=vue-build /app/dist ./dist
+COPY flask/src .
 
-EXPOSE $FLASK_PORT $VITE_PORT
+# Install python packages
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-ENTRYPOINT ["sh", "-c", "cd /app/flask && python main.py & cd /app/vue && npm run preview -- --host 0.0.0.0 --port $VITE_PORT"]
+# Open port
+EXPOSE $PORT
+
+# Set user
+USER $USER_ID
+
+ENTRYPOINT ["python"]
+CMD ["main.py"]
