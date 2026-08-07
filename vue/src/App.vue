@@ -9,6 +9,7 @@
     const pdfContainer = ref(null)
     const pdfViewer = ref(null)
     const popup = ref(null)
+    const fileInput = ref(null)
 
     const originalFile = ref(null)
     const currentFilename = ref(null)
@@ -26,9 +27,31 @@
         togglePopUp(text, x, y)
     }
 
+    const setCurrentFile = (file) => {
+        originalFile.value = currentFile.value = file
+        currentFilename.value = file.name
+    }
+
     const onFileDrop = (files) => {
-        originalFile.value = currentFile.value = files[0]
-        currentFilename.value = files[0].name
+        const file = files?.find((candidate) => candidate.type === 'application/pdf')
+        if (!file) {
+            return
+        }
+        setCurrentFile(file)
+    }
+
+    const openFileDialog = () => {
+        fileInput.value?.click()
+    }
+
+    const onFileDialogChange = (event) => {
+        const [file] = event.target.files ?? []
+        if (file?.type === 'application/pdf') {
+            setCurrentFile(file)
+        }
+
+        // Allow re-selecting the same file in the native dialog.
+        event.target.value = ''
     }
 
     const onLoadingComplete = () => {
@@ -140,7 +163,14 @@
 
 <template>
     <Guidelines />
-    <FileDrop @files-dropped="onFileDrop" v-if="currentFile == null" />
+    <input
+        ref="fileInput"
+        type="file"
+        accept="application/pdf"
+        style="display: none"
+        @change="onFileDialogChange"
+    />
+    <FileDrop @files-dropped="onFileDrop" @open-file-dialog="openFileDialog" v-if="currentFile == null" />
     <div class="mainContainer" v-if="currentFile != null">
 
         <div ref="pdfContainer" :class="['pdfContainer', { 'no-scroll': isLoading }]">
