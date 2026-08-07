@@ -2,12 +2,14 @@
     import { ref, onMounted, onUnmounted } from 'vue'
     import Notification from './Notification.vue'
 
-    const emit = defineEmits(['files-dropped'])
+    const emit = defineEmits(['files-dropped', 'open-file-dialog'])
     const isDragging = ref(false)
     const showErrorNotification = ref(false)
+    const dragDepth = ref(0)
 
     function onDrop(e) {
         e.preventDefault()
+        dragDepth.value = 0
         isDragging.value = false
         const files = [...e.dataTransfer.files]
         const pdfFiles = files.filter(file => file.type === 'application/pdf')
@@ -25,47 +27,47 @@
         e.preventDefault()
     }
 
-    function handleDragEnter() {
+    function handleDragEnter(e) {
+        preventDefaults(e)
+        dragDepth.value += 1
         isDragging.value = true
     }
 
     function handleDragLeave(e) {
-        isDragging.value = false
+        preventDefaults(e)
+        dragDepth.value = Math.max(0, dragDepth.value - 1)
+        isDragging.value = dragDepth.value > 0
     }
 
-    const events = ['dragenter', 'dragover', 'dragleave', 'drop']
+    function onOpenFileDialog() {
+        if (isDragging.value) {
+            return
+        }
+        emit('open-file-dialog')
+    }
 
     onMounted(() => {
-        const dropZone = document.querySelector('.dropZone')
-        if (dropZone) {
-            events.forEach((eventName) => {
-                dropZone.addEventListener(eventName, preventDefaults)
-            })
-            dropZone.addEventListener('dragenter', handleDragEnter)
-            dropZone.addEventListener('dragleave', handleDragLeave)
-            dropZone.addEventListener('drop', handleDragLeave)
-        }
+        window.addEventListener('dragenter', handleDragEnter)
+        window.addEventListener('dragover', preventDefaults)
+        window.addEventListener('dragleave', handleDragLeave)
+        window.addEventListener('drop', onDrop)
     })
 
     onUnmounted(() => {
-        const dropZone = document.querySelector('.dropZone')
-        if (dropZone) {
-            events.forEach((eventName) => {
-                dropZone.removeEventListener(eventName, preventDefaults)
-            })
-            dropZone.removeEventListener('dragenter', handleDragEnter)
-            dropZone.removeEventListener('dragleave', handleDragLeave)
-            dropZone.removeEventListener('drop', handleDragLeave)
-        }
+        window.removeEventListener('dragenter', handleDragEnter)
+        window.removeEventListener('dragover', preventDefaults)
+        window.removeEventListener('dragleave', handleDragLeave)
+        window.removeEventListener('drop', onDrop)
     })
 </script>
 
 <template>
-    <div @drop.prevent="onDrop" :class="['dropZone', { 'dragging': isDragging }]"></div>
+    <div @drop.prevent.stop="onDrop" :class="['dropZone', { 'dragging': isDragging }]" ></div>
     <div class="dropOverlay">
         <div>
             <div class="header">Træk og slip</div>
-            <div class="subheader">en <span class="heavy">PDF</span>-fil her for at starte</div>
+            <div class="subheader">en <span class="heavy">PDF</span>-fil her for at starte, eller</div>
+            <div :class="['button', { 'button-disabled': isDragging }]" @click="onOpenFileDialog">Tryk her for at vælge en fil</div>
         </div>
     </div>
     <Notification title="Forkert filtype" text="Det er kun muligt at anonymisere PDF-filer" v-if="showErrorNotification" />
@@ -76,6 +78,7 @@
     position: absolute;
     width: 100%;
     height: 100vh;
+    z-index: 1;
 }
     .dropZone.dragging ~ .dropOverlay {
         background-color: rgb(251, 252, 247);
@@ -86,6 +89,9 @@
     }
 
 .dropOverlay {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
     background-color: rgb(237, 238, 234);
     transition: 0.3s;
 
@@ -93,6 +99,7 @@
     height: 100%;
     padding: 1rem;
     color: rgb(168, 168, 168);
+    user-select: none;
 }
     .dropOverlay > div {
         transition: 0.3s;
@@ -114,4 +121,15 @@
     .heavy {
         font-weight: 400;
     }
+.button {
+    pointer-events: auto;
+    cursor: pointer;
+    font-size: 1em;
+    color: rgb(129, 129, 129);
+    transition: opacity 0.3s, background-color 0.2s;
+}
+.button-disabled {
+    pointer-events: none;
+    opacity: 0.3;
+}
 </style>
