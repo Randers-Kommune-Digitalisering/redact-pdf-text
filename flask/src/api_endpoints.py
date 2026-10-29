@@ -1,14 +1,35 @@
-import logging
-import fitz  # PyMuPDF
-import re
-import json
+"""Flask API endpoints for PDF redaction."""
 
-from flask import Blueprint, jsonify
-from flask import request, send_file
 import io
+import json
+import logging
+import re
+import tempfile
+from pathlib import Path
+
+import fitz  # PyMuPDF
+from flask import Blueprint, jsonify, request, send_file
 
 logger = logging.getLogger(__name__)
 api_endpoints = Blueprint('api', __name__, url_prefix='/api')
+
+
+def _ocr_pdf(input_pdf: bytes) -> bytes:
+    """Add a Danish OCR text layer to a PDF."""
+    import ocrmypdf
+
+    with tempfile.TemporaryDirectory() as workdir:
+        input_path = Path(workdir) / 'input.pdf'
+        output_path = Path(workdir) / 'output.pdf'
+        input_path.write_bytes(input_pdf)
+        ocrmypdf.ocr(
+            input_path,
+            output_path,
+            language=['dan'],
+            deskew=True,
+            rotate_pages=True,
+        )
+        return output_path.read_bytes()
 
 
 @api_endpoints.route('/status', methods=['GET'])
@@ -47,9 +68,19 @@ def redact_pdf():
     # Load the PDF file
     try:
         doc = fitz.open(stream=input_pdf, filetype="pdf")
-        output_stream = io.BytesIO()
     except Exception:
         return jsonify({"success": False, "message": "Error loading PDF file"}), 400
+
+    if any(not page.get_text("text").strip() for page in doc):
+        doc.close()
+        try:
+            input_pdf = _ocr_pdf(input_pdf)
+            doc = fitz.open(stream=input_pdf, filetype="pdf")
+        except Exception:
+            logger.error("OCR processing failed")
+            return jsonify({"success": False, "message": "Error processing scanned PDF"}), 500
+
+    output_stream = io.BytesIO()
 
     # Loop through each page
     for page_num in range(len(doc)):

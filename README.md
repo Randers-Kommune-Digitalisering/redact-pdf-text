@@ -41,7 +41,7 @@ flowchart LR
     C-->D
 ```
 
-Brugeren uploader en PDF-fil via frontend-applikationen. Filen sendes til backend-API'et, hvor PyMuPDF anvendes til at fjerne de valgte tekster. Den redigerede fil sendes derefter tilbage til brugerens klient, og kan derefter downloades. Data gemmes ikke i applikationen, men lagres midlertidigt i klientens cache.
+Brugeren uploader en PDF-fil via frontend-applikationen. Filen sendes til backend-API'et, hvor PyMuPDF anvendes til at fjerne de valgte tekster. Sider uden tekstlag OCR-behandles automatisk med dansk sprogmodel, før anonymiseringen udføres. OCR-arbejdsfiler slettes efter behandlingen, og den redigerede fil sendes tilbage til brugerens klient. Data gemmes ikke permanent i applikationen.
 
 ## Afhængigheder
 
@@ -49,6 +49,7 @@ Brugeren uploader en PDF-fil via frontend-applikationen. Filen sendes til backen
 - Vue.js
 - Flask
 - PyMuPDF
+- OCRmyPDF, Tesseract med dansk sprogmodel, Ghostscript og qpdf
 
 :cloud: | API'er, CDN'er og andre online services som applikationen kommunikerer med
 - Ingen eksterne API'er anvendes
@@ -79,6 +80,8 @@ For at installere og starte løsningen lokalt eller i CodeSpace, følg disse tri
 
 4. Installer afhængigheder for backend:
     ```sh
+    sudo apt-get update
+    sudo apt-get install -y tesseract-ocr tesseract-ocr-dan ghostscript qpdf
     cd ../flask/src
     pip install -r requirements.txt
     ```

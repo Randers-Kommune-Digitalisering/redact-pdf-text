@@ -7,3 +7,4 @@ requests-pkcs12==1.24
 SQLAlchemy
 swig
 PyMuPDF==1.25.0
+ocrmypdf==17.13.0
