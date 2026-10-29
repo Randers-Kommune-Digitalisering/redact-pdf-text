@@ -6,7 +6,7 @@ WORKDIR /app
 COPY vue .
 RUN npm install && npm run build
 
-FROM python:3.12-alpine
+FROM python:3.12-slim
 
 # Set dir and user
 ENV GROUP_NAME=app
@@ -19,9 +19,11 @@ ENV PORT=8080
 RUN addgroup --gid $GROUP_ID $GROUP_NAME && \
     adduser $USER_ID -u $USER_ID -D -G $GROUP_NAME -h $HOME
 
-# Install packages
-RUN apk update
-RUN apk add musl-dev gcc libpq-dev python3-dev
+# Install OCR and build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc libpq-dev python3-dev \
+    ghostscript qpdf tesseract-ocr tesseract-ocr-dan \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working dir
 WORKDIR $HOME
